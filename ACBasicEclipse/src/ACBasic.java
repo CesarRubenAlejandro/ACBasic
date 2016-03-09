@@ -2,51 +2,74 @@
 import Data.*;
 public class ACBasic implements ACBasicConstants {
   private static DirectorioProcedimientos dirProcedimientos;
+  private static String procedimientoActual;
 
-  public static void main(String args []) throws ParseException
-  {
+  public static void main(String args []) throws ParseException {
     ACBasic parser = new ACBasic(System.in);
-    while (true)
+
+    System.out.println("Reading from standard input...");
+    try
     {
-      System.out.println("Reading from standard input...");
-      try
-      {
-        switch (parser.prog())
-        {
-          case 0 :
-          System.out.println("OK.");
-          break;
-          case 1 :
-          System.out.println("Goodbye.");
-          break;
-          default :
-          break;
-        }
+     parser.prog();
+     System.out.println("OK.");
+     for (String keyActual: dirProcedimientos.getProcedimientos().keySet()){
+          System.out.println("---------------------------");
+          Procedimiento actual = dirProcedimientos.getProcedimientos().get(keyActual);
+          System.out.print(actual.getNombreProcedimiento()+ ": ");
+          System.out.println(actual.getTipoProcedimiento());
+          for (String keyVariable : actual.getVariables().keySet()) {
+                        Variable varActual = actual.getVariables().get(keyVariable);
+                        System.out.print(varActual.getNombreVariable() + ": ");
+                        System.out.println(varActual.getTipoVariable());
+          }
       }
-      catch (Exception e)
+
+      } catch (Exception e)
       {
         System.out.println("NOK.");
         System.out.println(e.getMessage());
-        parser.ReInit(System.in);
       }
       catch (Error e)
       {
         System.out.println("Oops.");
         System.out.println(e.getMessage());
-        break;
       }
+    }
+
+
+  static void errorHandler(int type, String detail) {
+    switch (type){
+      case 1:
+        System.out.println("Error: Procedimiento repetido:" + detail);
+                System.exit(0);
+        break;
+          case 2:
+        System.out.println("Error: Variable repetida:" + detail);
+                System.exit(0);
+        break;
+      case 3:
+        System.out.println("Error: Parametro repetido:" + detail);
+                System.exit(0);
+        break;
+
     }
   }
 
-  static final public int prog() throws ParseException {
+  static final public void prog() throws ParseException {
  Token idPrograma;
     jj_consume_token(PROGRAM);
     dirProcedimientos = new DirectorioProcedimientos();
     idPrograma = jj_consume_token(ID);
+        // guardar el id del procedimiento actual
+                procedimientoActual = idPrograma.toString();
+                // crear un objeto procedimiento auxiliar para guardar info del procedimiento program
                 Procedimiento programProc = new Procedimiento();
                 programProc.setNombreProcedimiento(idPrograma.toString());
                 programProc.setTipoProcedimiento("program");
-                dirProcedimientos.getProcedimientos().put(idPrograma.toString(),programProc);
+                // guardar el procedimiento program en el directorio de procedimientos
+                if (!dirProcedimientos.agregarProcedimiento(programProc)) {
+                  errorHandler(1,idPrograma.toString());
+                }
     jj_consume_token(PYC);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case VAR:
@@ -69,32 +92,36 @@ public class ACBasic implements ACBasicConstants {
       func();
     }
     main();
-                                     {if (true) return 0;}
-    throw new Error("Missing return statement in function");
   }
 
-  static final public void tipo() throws ParseException {
+  static final public String tipo() throws ParseException {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case INT:
       jj_consume_token(INT);
+           {if (true) return "int";}
       break;
     case FLOAT:
       jj_consume_token(FLOAT);
+               {if (true) return "float";}
       break;
     case CHAR:
       jj_consume_token(CHAR);
+              {if (true) return "char";}
       break;
     case STRING:
       jj_consume_token(STRING);
+                {if (true) return "string";}
       break;
     case BOOL:
       jj_consume_token(BOOL);
+              {if (true) return "bool";}
       break;
     default:
       jj_la1[2] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
+    throw new Error("Missing return statement in function");
   }
 
   static final public void cte() throws ParseException {
@@ -145,6 +172,8 @@ public class ACBasic implements ACBasicConstants {
 
   static final public void vars() throws ParseException {
     jj_consume_token(VAR);
+    // crear tabla de variables para el procedimiento actual
+    dirProcedimientos.getProcedimientos().get(procedimientoActual).crearTablaDeVariables();
     vars1();
     jj_consume_token(PYC);
     label_3:
@@ -187,8 +216,17 @@ public class ACBasic implements ACBasicConstants {
   }
 
   static final public void vars2() throws ParseException {
-    tipo();
-    jj_consume_token(ID);
+ String tipoVariable; Token nombreVariable;
+    tipoVariable = tipo();
+    nombreVariable = jj_consume_token(ID);
+    String scopeVar = "local";
+    if (procedimientoActual.equals("program")) {
+      scopeVar = "global";
+        }
+    Variable varAuxiliar = new Variable(nombreVariable.toString(), tipoVariable, scopeVar);
+    if(!dirProcedimientos.getProcedimientos().get(procedimientoActual).agregarVariable(varAuxiliar)){
+      errorHandler(2,nombreVariable.toString());
+    }
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case IGUAL:
       jj_consume_token(IGUAL);
@@ -209,7 +247,11 @@ public class ACBasic implements ACBasicConstants {
         break label_4;
       }
       jj_consume_token(COMA);
-      jj_consume_token(ID);
+      nombreVariable = jj_consume_token(ID);
+            varAuxiliar = new Variable(nombreVariable.toString(), tipoVariable, scopeVar);
+            if(!dirProcedimientos.getProcedimientos().get(procedimientoActual).agregarVariable(varAuxiliar)) {
+                errorHandler(2,nombreVariable.toString());
+        }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case IGUAL:
         jj_consume_token(IGUAL);
@@ -223,9 +265,22 @@ public class ACBasic implements ACBasicConstants {
   }
 
   static final public void vars3() throws ParseException {
+ String tipoArreglo; Token nombreArreglo;
     jj_consume_token(ARRAY);
-    tipo();
-    jj_consume_token(ID);
+    Variable auxArreglo = new Variable();
+    tipoArreglo = tipo();
+    auxArreglo.setTipoVariable(tipoArreglo);
+    nombreArreglo = jj_consume_token(ID);
+    auxArreglo.setNombreVariable(nombreArreglo.toString());
+    String scope = "local";
+    if(procedimientoActual.equals("program")){
+      scope = "global";
+    }
+    auxArreglo.setScope(scope);
+
+    if(!dirProcedimientos.getProcedimientos().get(procedimientoActual).agregarVariable(auxArreglo)){
+      errorHandler(2,nombreArreglo.toString());
+    }
     jj_consume_token(CORIZQ);
     jj_consume_token(CTEI);
     jj_consume_token(CORDER);
@@ -241,32 +296,46 @@ public class ACBasic implements ACBasicConstants {
   }
 
   static final public void func() throws ParseException {
+ String tipoFuncion; Token nombreProc;
     jj_consume_token(FUNC);
-    func1();
-    jj_consume_token(ID);
+   Procedimiento procAux = new Procedimiento();
+    tipoFuncion = func1();
+   procAux.setTipoProcedimiento(tipoFuncion);
+    nombreProc = jj_consume_token(ID);
+   procAux.setNombreProcedimiento(nombreProc.toString());
+
+   if (!dirProcedimientos.agregarProcedimiento(procAux)) {
+                  errorHandler(1, nombreProc.toString());
+        } else{
+                procedimientoActual = nombreProc.toString();
+        }
     jj_consume_token(PARIZQ);
     param();
     jj_consume_token(PARDER);
     body();
   }
 
-  static final public void func1() throws ParseException {
+  static final public String func1() throws ParseException {
+ String tipoFuncion;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case INT:
     case CHAR:
     case FLOAT:
     case BOOL:
     case STRING:
-      tipo();
+      tipoFuncion = tipo();
+                       {if (true) return tipoFuncion;}
       break;
     case VOID:
       jj_consume_token(VOID);
+             {if (true) return "void";}
       break;
     default:
       jj_la1[11] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
+    throw new Error("Missing return statement in function");
   }
 
   static final public void param() throws ParseException {
@@ -298,7 +367,14 @@ public class ACBasic implements ACBasicConstants {
   }
 
   static final public void param1() throws ParseException {
-    tipo();
+ String tipoParam; Token nombreParam;
+    tipoParam = tipo();
+    if(dirProcedimientos.getProcedimientos().get(procedimientoActual).getVariables()==null){
+     dirProcedimientos.getProcedimientos().get(procedimientoActual).crearTablaDeVariables();
+        }
+    Variable paramAux = new Variable();
+    paramAux.setTipoVariable(tipoParam);
+    paramAux.setScope("local");
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case AMP:
       jj_consume_token(AMP);
@@ -307,7 +383,12 @@ public class ACBasic implements ACBasicConstants {
       jj_la1[14] = jj_gen;
       ;
     }
-    jj_consume_token(ID);
+    nombreParam = jj_consume_token(ID);
+     paramAux.setNombreVariable(nombreParam.toString());
+
+     if(!dirProcedimientos.getProcedimientos().get(procedimientoActual).agregarVariable(paramAux)){
+                errorHandler(3, nombreParam.toString());
+     }
   }
 
   static final public void body() throws ParseException {

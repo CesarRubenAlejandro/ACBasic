@@ -2,7 +2,7 @@ package Data;
 
 /**
  * Clase que representa una variable del lenguaje ACBasic
- * @author Cesar
+ * @author Cesar, Angela
  *
  */
 public class Variable {

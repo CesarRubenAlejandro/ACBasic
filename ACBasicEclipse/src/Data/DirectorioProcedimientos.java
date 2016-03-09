@@ -1,12 +1,10 @@
 package Data;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * Clase que representa la tabla de procedimientos de un programa 
- * @author Cesar
+ * @author Cesar, Angela
  *
  */
 public class DirectorioProcedimientos {
@@ -25,6 +23,19 @@ public class DirectorioProcedimientos {
 
 	public void setProcedimientos(HashMap<String, Procedimiento> procedimientos) {
 		this.procedimientos = procedimientos;
+	}
+	
+	/**
+	 * Metodo para dar de alta un procedimiento en el directorio de procedimientos
+	 * @param procedimientoActual
+	 */
+	public boolean agregarProcedimiento(Procedimiento procedimientoActual){
+		if (this.procedimientos.containsKey(procedimientoActual.getNombreProcedimiento())){
+			return false;
+		} else {
+			this.procedimientos.put(procedimientoActual.getNombreProcedimiento(), procedimientoActual);
+			return true;
+		}
 	}
 
 }

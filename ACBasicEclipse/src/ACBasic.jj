@@ -1,5 +1,6 @@
 /**
  * JavaCC template file created by SF JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
+ * Autors: Angela Romo, Cesar Rodriguez
  */
 options
 {
@@ -11,41 +12,56 @@ import Data.*;
 public class ACBasic
 {
   private static DirectorioProcedimientos dirProcedimientos;
+  private static String procedimientoActual;
   
-  public static void main(String args []) throws ParseException
-  {
+  public static void main(String args []) throws ParseException {
     ACBasic parser = new ACBasic(System.in);
-    while (true)
+
+    System.out.println("Reading from standard input...");
+    try
     {
-      System.out.println("Reading from standard input...");
-      try
-      {
-        switch (parser.prog())
-        {
-          case 0 : 
-          System.out.println("OK.");
-          break;
-          case 1 : 
-          System.out.println("Goodbye.");
-          break;
-          default : 
-          break;
-        }
+     parser.prog();
+     System.out.println("OK.");
+     for (String keyActual: dirProcedimientos.getProcedimientos().keySet()){
+          System.out.println("---------------------------");
+          Procedimiento actual = dirProcedimientos.getProcedimientos().get(keyActual);
+          System.out.print(actual.getNombreProcedimiento()+ ": ");
+          System.out.println(actual.getTipoProcedimiento());
+          for (String keyVariable : actual.getVariables().keySet()) {			Variable varActual = actual.getVariables().get(keyVariable);
+			System.out.print(varActual.getNombreVariable() + ": ");
+			System.out.println(varActual.getTipoVariable());
+          }
       }
-      catch (Exception e)
+          
+      } catch (Exception e)
       {
         System.out.println("NOK.");
         System.out.println(e.getMessage());
-        parser.ReInit(System.in);
       }
       catch (Error e)
       {
         System.out.println("Oops.");
         System.out.println(e.getMessage());
-        break;
       }
     }
-  }
+  
+
+  static void errorHandler(int type, String detail) {
+    switch (type){
+      case 1:
+        System.out.println("Error: Procedimiento repetido:" + detail);
+		System.exit(0);
+      	break;
+	  case 2:
+        System.out.println("Error: Variable repetida:" + detail);
+		System.exit(0);
+      	break;
+      case 3:
+        System.out.println("Error: Parametro repetido:" + detail);
+		System.exit(0);
+      	break;
+          }  }
+  
 }
 
 PARSER_END(ACBasic)
@@ -118,25 +134,34 @@ TOKEN :
 }
 
 
-int prog() :
+void prog() :
 {Token idPrograma;}
 {
   < PROGRAM >  {
     dirProcedimientos = new DirectorioProcedimientos();  }
    idPrograma =  <ID >
    {
+     	// guardar el id del procedimiento actual
+		procedimientoActual = idPrograma.toString();
+		// crear un objeto procedimiento auxiliar para guardar info del procedimiento program
 		Procedimiento programProc = new Procedimiento();
 		programProc.setNombreProcedimiento(idPrograma.toString());
 		programProc.setTipoProcedimiento("program");
-		dirProcedimientos.getProcedimientos().put(idPrograma.toString(),programProc);
+		// guardar el procedimiento program en el directorio de procedimientos
+		if (!dirProcedimientos.agregarProcedimiento(programProc)) {
+		  errorHandler(1,idPrograma.toString());		}
    }
-   <PYC > [vars()] (func())* main() {return 0; }
+   <PYC > [vars()] (func())* main()
 }
 
-void tipo():
+String tipo():
 {}
 {
-  < INT > | < FLOAT > | < CHAR > | < STRING > | < BOOL >
+  < INT > {return "int";}
+  | < FLOAT > {return "float";}
+  | < CHAR > {return "char";}
+  | < STRING > {return "string";}
+  | < BOOL > {return "bool";}
 }
 
 void cte():
@@ -154,7 +179,10 @@ void defarr():
 void vars():
 {}
 {
-  < VAR > vars1() < PYC > (vars1() < PYC >)*
+  < VAR >  {
+    // crear tabla de variables para el procedimiento actual
+    dirProcedimientos.getProcedimientos().get(procedimientoActual).crearTablaDeVariables();  }
+   vars1() < PYC > (vars1() < PYC >)*
 }
 
 void vars1():
@@ -164,28 +192,72 @@ void vars1():
 }
 
 void vars2():
-{}
+{String tipoVariable; Token nombreVariable;}
 {
-  tipo() < ID > [<IGUAL > cte()] (< COMA > <ID > [<IGUAL > cte()] )* 
+  tipoVariable = tipo() nombreVariable=< ID >
+  {
+    String scopeVar = "local";
+    if (procedimientoActual.equals("program")) {      scopeVar = "global";
+   	}
+    Variable varAuxiliar = new Variable(nombreVariable.toString(), tipoVariable, scopeVar);
+    if(!dirProcedimientos.getProcedimientos().get(procedimientoActual).agregarVariable(varAuxiliar)){
+      errorHandler(2,nombreVariable.toString());    }  }[<IGUAL > cte()]
+  (< COMA > nombreVariable=<ID >
+	{
+	    varAuxiliar = new Variable(nombreVariable.toString(), tipoVariable, scopeVar);
+	    if(!dirProcedimientos.getProcedimientos().get(procedimientoActual).agregarVariable(varAuxiliar)) {
+      		errorHandler(2,nombreVariable.toString());
+    	}
+    }
+    [<IGUAL > cte()] )* 
 }
 
 void vars3():
-{}
+{String tipoArreglo; Token nombreArreglo;}
 {
-  < ARRAY > tipo() < ID > <CORIZQ > <CTEI > <CORDER > [<IGUAL > defarr()]
+  < ARRAY >
+  {
+    Variable auxArreglo = new Variable();
+  }
+  tipoArreglo = tipo()  {
+    auxArreglo.setTipoVariable(tipoArreglo);  }
+  nombreArreglo = < ID >
+  {
+    auxArreglo.setNombreVariable(nombreArreglo.toString());
+    String scope = "local";
+    if(procedimientoActual.equals("program")){
+      scope = "global";    }
+    auxArreglo.setScope(scope);
+
+    if(!dirProcedimientos.getProcedimientos().get(procedimientoActual).agregarVariable(auxArreglo)){
+      errorHandler(2,nombreArreglo.toString());    }  }  
+   <CORIZQ > <CTEI > <CORDER > [<IGUAL > defarr()]
 }
 
 
 void func():
-{}
+{String tipoFuncion; Token nombreProc;}
 {
- < FUNC > func1() < ID > <PARIZQ > param() < PARDER > body()
+ < FUNC > {
+   Procedimiento procAux = new Procedimiento(); }
+ tipoFuncion = func1() {
+   procAux.setTipoProcedimiento(tipoFuncion); }
+ nombreProc = < ID > {
+   procAux.setNombreProcedimiento(nombreProc.toString());
+
+   if (!dirProcedimientos.agregarProcedimiento(procAux)) {
+		  errorHandler(1, nombreProc.toString());
+	} else{
+   		procedimientoActual = nombreProc.toString();	}
+ }
+ <PARIZQ > param() < PARDER > body()
 }
 
-void func1():
-{}
+String func1():
+{String tipoFuncion;}
 {
- tipo() | < VOID >
+ tipoFuncion = tipo() {return tipoFuncion;}
+ | < VOID > {return "void";}
 }
  
 void param():
@@ -195,9 +267,19 @@ void param():
 }
 
 void param1():
-{}
+{String tipoParam; Token nombreParam;}
 {
-  tipo() [< AMP >] <ID > 
+  tipoParam = tipo()  {
+    if(dirProcedimientos.getProcedimientos().get(procedimientoActual).getVariables()==null){     dirProcedimientos.getProcedimientos().get(procedimientoActual).crearTablaDeVariables();
+	}
+    Variable paramAux = new Variable();
+    paramAux.setTipoVariable(tipoParam);
+    paramAux.setScope("local");  }
+   [< AMP >] nombreParam = <ID >   {
+     paramAux.setNombreVariable(nombreParam.toString());
+
+     if(!dirProcedimientos.getProcedimientos().get(procedimientoActual).agregarVariable(paramAux)){		errorHandler(3, nombreParam.toString());
+     }   } 
 }
 
 void body():
