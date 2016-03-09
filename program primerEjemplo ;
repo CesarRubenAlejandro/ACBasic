@@ -1,0 +1,43 @@
+program primerEjemplo;
+var
+	int a,b = 15,c;
+	char d;
+	float e = 2.5;
+	string mensaje;
+	array int arreglo1 [3] = [14,15,16];
+	array char arreglo2 [5];
+
+	
+func void nombreFuncion1 (int param1, int param2, float & param3) {
+	if (param1 > param2) {
+		print ("hola");
+	} elif (param1 == param2){
+		e = e - 5.0 / (3.5 + 10.1);
+		print ("que tal");
+	} 
+	else {
+		print ("adios");
+	}
+	param3 = 10.0;
+}
+
+func int nombreFuncion2 (){
+	var
+		bool bo = true;
+		int a = 1;
+		int contador = 0;
+	while (bo || b == 15){
+		b = b - a;
+		contador = contador + 1;
+	}
+	print (contador);
+}
+
+main() {
+	read (a);
+	read (c);
+	read (mensaje);
+
+	print (mensaje);
+
+}
