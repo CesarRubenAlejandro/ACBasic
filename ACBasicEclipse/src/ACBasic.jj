@@ -1,0 +1,310 @@
+/**
+ * JavaCC template file created by SF JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
+ */
+options
+{
+  static = true;
+}
+
+PARSER_BEGIN(ACBasic)
+
+public class ACBasic
+{
+  public static void main(String args []) throws ParseException
+  {
+    ACBasic parser = new ACBasic(System.in);
+    while (true)
+    {
+      System.out.println("Reading from standard input...");
+      try
+      {
+        switch (parser.prog())
+        {
+          case 0 : 
+          System.out.println("OK.");
+          break;
+          case 1 : 
+          System.out.println("Goodbye.");
+          break;
+          default : 
+          break;
+        }
+      }
+      catch (Exception e)
+      {
+        System.out.println("NOK.");
+        System.out.println(e.getMessage());
+        parser.ReInit(System.in);
+      }
+      catch (Error e)
+      {
+        System.out.println("Oops.");
+        System.out.println(e.getMessage());
+        break;
+      }
+    }
+  }
+}
+
+PARSER_END(ACBasic)
+
+SKIP : { " " | "\r" | "\t" | "\n" }
+TOKEN: { < PROGRAM : "program" > }
+TOKEN: { < VAR : "var" > }
+TOKEN: { < FUNC : "func" > }
+TOKEN: { < MAIN : "main" > }
+TOKEN: { < VOID : "void" > }
+
+TOKEN: { < INT : "int" > }
+TOKEN: { < CHAR : "char" > }
+TOKEN: { < FLOAT : "float" > }
+TOKEN: { < BOOL : "bool" > }
+TOKEN: { < STRING : "string" > }
+TOKEN: { < ARRAY : "array" > }
+
+TOKEN: { < PRINT : "print" > }
+TOKEN: { < READ : "read" > }
+TOKEN: { < WHILE : "while" > }
+TOKEN: { < TRUE : "true" > }
+TOKEN: { < FALSE : "false" > }
+TOKEN: { < IF : "if" > }
+TOKEN: { < ELIF : "elif" > }
+TOKEN: { < ELSE : "else" > }
+
+TOKEN: { < AMP : "&" > }
+TOKEN: { < RETURN : "return" > }
+
+TOKEN: { < PYC : ";" > }
+TOKEN: { < COMA : "," > }
+
+
+TOKEN: { < LLAIZQ : "{" > }
+TOKEN: { < LLADER : "}" > }
+TOKEN: { < CORIZQ : "[" > }
+TOKEN: { < CORDER : "]" > }
+
+TOKEN: { < IGUAL : "=" > }
+TOKEN: { < PARIZQ : "(" > }
+TOKEN: { < PARDER : ")" > }
+TOKEN: { < MAYOR : ">" > }
+TOKEN: { < MENOR : "<" > }
+TOKEN: { < MENORIG : "<=" > }
+TOKEN: { < MAYORIG : ">=" > }
+TOKEN: { < IGUALIG : "==" > }
+TOKEN: { < DIFERENTE : "!=" > }
+TOKEN: { < NEGACION : "!" > }
+TOKEN: { < AND : "&&" > }
+TOKEN: { < OR : "||" > }
+
+TOKEN: { < MAS : "+" > }
+TOKEN: { < MENOS : "-" > }
+TOKEN: { < POR : "*" > }
+TOKEN: { < ENTRE : "/" > }
+
+TOKEN: { < ID : < LETTER >(("_")? (< LETTER >|< DIGIT >))* > }
+TOKEN: { < CTEI : (<DIGIT>)+> }
+TOKEN: { < CTEF : (<DIGIT>)+ "." (<DIGIT>)+ > }
+TOKEN: { < CTESTR : "\"" (< DIGIT >|< LETTER >| < CARACTER >)* "\"" > }
+TOKEN: { < CTECHAR : "'" (< DIGIT >|< LETTER >| < CARACTER >)? "'" > }
+
+TOKEN :
+{
+  <#DIGIT: ["0"-"9"]>
+| <#LETTER: ["a"-"z", "A"-"Z"]>
+| < #CARACTER : ["¡" , "!" , "@" , "#" , "$" , "%" , "&" , "/" , "\\" , "(" , ")" , "=" ,"¿" , "?" , "-" , "_"
+	,"+" ,"*","{","}" ,"[" ,"]" ,":" ,";" ,"." ,"," ,">","<" ,"|" ," "]>
+}
+
+
+int prog() :
+{}
+{
+  < PROGRAM > <ID > <PYC > [vars()] (func())* main() { return 0; }
+}
+
+void tipo():
+{}
+{
+  < INT > | < FLOAT > | < CHAR > | < STRING > | < BOOL >
+}
+
+void cte():
+{}
+{
+  < CTEI > | < CTEF > | < TRUE > | < FALSE > | < CTESTR > | < CTECHAR >
+}
+
+void defarr():
+{}
+{
+  < CORIZQ > cte() (< COMA > cte())* < CORDER >
+}
+
+void vars():
+{}
+{
+  < VAR > vars1() < PYC > (vars1() < PYC >)*
+}
+
+void vars1():
+{}
+{
+  vars2() | vars3()
+}
+
+void vars2():
+{}
+{
+  tipo() < ID > [<IGUAL > cte()] (< COMA > <ID > [<IGUAL > cte()] )* 
+}
+
+void vars3():
+{}
+{
+  < ARRAY > tipo() < ID > <CORIZQ > <CTEI > <CORDER > [<IGUAL > defarr()]
+}
+
+
+void func():
+{}
+{
+ < FUNC > func1() < ID > <PARIZQ > param() < PARDER > body()
+}
+
+void func1():
+{}
+{
+ tipo() | < VOID >
+}
+ 
+void param():
+{}
+{
+  [param1() (< COMA > param1())*]
+}
+
+void param1():
+{}
+{
+  tipo() [< AMP >] <ID > 
+}
+
+void body():
+{}
+{
+  < LLAIZQ > [vars()] (body1())* [<RETURN > exp() < PYC >] <LLADER >
+}
+
+void body1():
+{}
+{
+  assignllam() | cond() | read() | write() | cycle()
+}
+
+void assign():
+{}
+{
+  [<CORIZQ > exp() < CORDER >] <IGUAL > exp() < PYC > 
+}
+
+void exp():
+{}
+{
+  e1() [(< AND > | < OR >) e1()]
+}
+
+void e1():
+{}
+{
+  e2() [(< MENOR > | < MAYOR > | < MENORIG > | < MAYORIG > | < IGUALIG > | < DIFERENTE > ) e2()]
+}
+
+void e2():
+{}
+{
+  term() ((< MAS > | < MENOS >) term())*
+}
+
+void term():
+{}
+{
+  fact() ((< POR > | < ENTRE >) fact())*
+}
+
+void fact():
+{}
+{
+  [<NEGACION >] (fact1() | fact2() | fact3())
+}
+
+void fact1():
+{}
+{
+  cte()
+}
+
+void fact2():
+{}
+{
+  < PARIZQ > exp() < PARDER >
+}
+
+void fact3():
+{}
+{
+ < ID > [(fact4() | fact5())] 
+}
+
+void fact4():
+{}
+{
+  < CORIZQ > exp() < CORDER >
+}
+
+void fact5():
+{}
+{
+  < PARIZQ > exp() (< COMA > exp())* < PARDER >
+}
+
+void cond():
+{}
+{
+  < IF > <PARIZQ > exp() < PARDER > body() (< ELIF > <PARIZQ > exp() < PARDER > body())* [<ELSE > body()]
+}
+
+void write():
+{}
+{
+  < PRINT > <PARIZQ > exp() < PARDER > <PYC >
+}
+
+void read():
+{}
+{
+  < READ > <PARIZQ > <ID > [<CORIZQ > exp() < CORDER >] < PARDER > <PYC >
+}
+
+void cycle():
+{}
+{
+  < WHILE > <PARIZQ > exp() < PARDER > body()
+}
+
+void llam():
+{}
+{
+   <PARIZQ > exp() (< COMA > exp())* < PARDER > <PYC >
+}
+
+void main():
+{}
+{
+  < MAIN > <PARIZQ > < PARDER > body()
+}
+
+void assignllam():
+{}
+{
+  < ID > (llam() | assign())
+}
