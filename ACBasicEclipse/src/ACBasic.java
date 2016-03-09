@@ -68,6 +68,7 @@ public class ACBasic implements ACBasicConstants {
                 programProc.setTipoProcedimiento("program");
                 // guardar el procedimiento program en el directorio de procedimientos
                 if (!dirProcedimientos.agregarProcedimiento(programProc)) {
+                  // si ya existe un procedimiento con ese nombre, reportar error
                   errorHandler(1,idPrograma.toString());
                 }
     jj_consume_token(PYC);
@@ -219,12 +220,17 @@ public class ACBasic implements ACBasicConstants {
  String tipoVariable; Token nombreVariable;
     tipoVariable = tipo();
     nombreVariable = jj_consume_token(ID);
+    // asignar el tipo de scope de la variable
+
     String scopeVar = "local";
     if (procedimientoActual.equals("program")) {
+          // unicamente si el procedimiento actual es de tipo program, el scope es global
       scopeVar = "global";
         }
+        // crear objeto variable y darlo de alta en directorio de variables del procedimiento actual
     Variable varAuxiliar = new Variable(nombreVariable.toString(), tipoVariable, scopeVar);
     if(!dirProcedimientos.getProcedimientos().get(procedimientoActual).agregarVariable(varAuxiliar)){
+          // si ya existe una variable en este directorio con el mismo nombre, reportar error
       errorHandler(2,nombreVariable.toString());
     }
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -248,8 +254,10 @@ public class ACBasic implements ACBasicConstants {
       }
       jj_consume_token(COMA);
       nombreVariable = jj_consume_token(ID);
+        // crear objeto variable y darlo de alta en directorio de variables del procedimiento actual
             varAuxiliar = new Variable(nombreVariable.toString(), tipoVariable, scopeVar);
             if(!dirProcedimientos.getProcedimientos().get(procedimientoActual).agregarVariable(varAuxiliar)) {
+                    // si ya existe una variable en este directorio con el mismo nombre, reportar error
                 errorHandler(2,nombreVariable.toString());
         }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -267,18 +275,26 @@ public class ACBasic implements ACBasicConstants {
   static final public void vars3() throws ParseException {
  String tipoArreglo; Token nombreArreglo;
     jj_consume_token(ARRAY);
+    // crear objeto variable
     Variable auxArreglo = new Variable();
     tipoArreglo = tipo();
+    // guardar el tipo de variable
     auxArreglo.setTipoVariable(tipoArreglo);
     nombreArreglo = jj_consume_token(ID);
+    // guardar el nombre de la variable
     auxArreglo.setNombreVariable(nombreArreglo.toString());
+
+    // definir el scope de la variable
     String scope = "local";
     if(procedimientoActual.equals("program")){
+      // unicamente si el procedimiento actual es program, el scope de la variable es global
       scope = "global";
     }
     auxArreglo.setScope(scope);
 
+        // dar de alta la variable en el directorio de variables del procedimiento actual
     if(!dirProcedimientos.getProcedimientos().get(procedimientoActual).agregarVariable(auxArreglo)){
+          // si ya existe una variable con ese nombre, reportar error
       errorHandler(2,nombreArreglo.toString());
     }
     jj_consume_token(CORIZQ);
@@ -298,15 +314,21 @@ public class ACBasic implements ACBasicConstants {
   static final public void func() throws ParseException {
  String tipoFuncion; Token nombreProc;
     jj_consume_token(FUNC);
+   // crear un objeto procedimiento
    Procedimiento procAux = new Procedimiento();
     tipoFuncion = func1();
+   // guardar el tipo de procedimiento
    procAux.setTipoProcedimiento(tipoFuncion);
     nombreProc = jj_consume_token(ID);
+   // guardar el nombre del procedimiento en el objeto
    procAux.setNombreProcedimiento(nombreProc.toString());
 
+        // dar de alta el procedimiento en el directorio de procedimientos
    if (!dirProcedimientos.agregarProcedimiento(procAux)) {
+          // reportar error si ya existe un procedimiento con este nombre
                   errorHandler(1, nombreProc.toString());
         } else{
+          // si se pudo guardar el procedimiento, asignar procedimientoActual con el id recien leido
                 procedimientoActual = nombreProc.toString();
         }
     jj_consume_token(PARIZQ);
@@ -369,9 +391,11 @@ public class ACBasic implements ACBasicConstants {
   static final public void param1() throws ParseException {
  String tipoParam; Token nombreParam;
     tipoParam = tipo();
+    // si el procedimiento actual no tiene ya un directorio de variables, crearlo
     if(dirProcedimientos.getProcedimientos().get(procedimientoActual).getVariables()==null){
      dirProcedimientos.getProcedimientos().get(procedimientoActual).crearTablaDeVariables();
         }
+        // crear objeto variable y guardar el tipo y scope
     Variable paramAux = new Variable();
     paramAux.setTipoVariable(tipoParam);
     paramAux.setScope("local");
@@ -384,9 +408,11 @@ public class ACBasic implements ACBasicConstants {
       ;
     }
     nombreParam = jj_consume_token(ID);
+     // guardar el nombre del parametro en el objeto
      paramAux.setNombreVariable(nombreParam.toString());
-
+        // dar de alta el parametro en el directorio de variables del procedimiento actual
      if(!dirProcedimientos.getProcedimientos().get(procedimientoActual).agregarVariable(paramAux)){
+                // reportar error si ya existe una variable con ese nombre
                 errorHandler(3, nombreParam.toString());
      }
   }
@@ -773,6 +799,15 @@ public class ACBasic implements ACBasicConstants {
 
   static final public void main() throws ParseException {
     jj_consume_token(MAIN);
+        // asignar procedimientoActual a main
+        procedimientoActual ="main";
+    // crear el procedimiento Main con nombre y tipo
+    Procedimiento mainProc = new Procedimiento();
+        mainProc.setNombreProcedimiento("main");
+        mainProc.setTipoProcedimiento("main");
+
+    // dar de alta el proc main en directorio de procedimientos
+    dirProcedimientos.agregarProcedimiento(mainProc);
     jj_consume_token(PARIZQ);
     jj_consume_token(PARDER);
     body();

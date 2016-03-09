@@ -149,6 +149,7 @@ void prog() :
 		programProc.setTipoProcedimiento("program");
 		// guardar el procedimiento program en el directorio de procedimientos
 		if (!dirProcedimientos.agregarProcedimiento(programProc)) {
+		  // si ya existe un procedimiento con ese nombre, reportar error
 		  errorHandler(1,idPrograma.toString());		}
    }
    <PYC > [vars()] (func())* main()
@@ -196,16 +197,23 @@ void vars2():
 {
   tipoVariable = tipo() nombreVariable=< ID >
   {
+    // asignar el tipo de scope de la variable
+    
     String scopeVar = "local";
-    if (procedimientoActual.equals("program")) {      scopeVar = "global";
+    if (procedimientoActual.equals("program")) {	  // unicamente si el procedimiento actual es de tipo program, el scope es global
+      scopeVar = "global";
    	}
+   	// crear objeto variable y darlo de alta en directorio de variables del procedimiento actual
     Variable varAuxiliar = new Variable(nombreVariable.toString(), tipoVariable, scopeVar);
     if(!dirProcedimientos.getProcedimientos().get(procedimientoActual).agregarVariable(varAuxiliar)){
+	  // si ya existe una variable en este directorio con el mismo nombre, reportar error
       errorHandler(2,nombreVariable.toString());    }  }[<IGUAL > cte()]
   (< COMA > nombreVariable=<ID >
 	{
+   	// crear objeto variable y darlo de alta en directorio de variables del procedimiento actual
 	    varAuxiliar = new Variable(nombreVariable.toString(), tipoVariable, scopeVar);
 	    if(!dirProcedimientos.getProcedimientos().get(procedimientoActual).agregarVariable(varAuxiliar)) {
+		    // si ya existe una variable en este directorio con el mismo nombre, reportar error
       		errorHandler(2,nombreVariable.toString());
     	}
     }
@@ -217,19 +225,27 @@ void vars3():
 {
   < ARRAY >
   {
+    // crear objeto variable
     Variable auxArreglo = new Variable();
   }
   tipoArreglo = tipo()  {
+    // guardar el tipo de variable
     auxArreglo.setTipoVariable(tipoArreglo);  }
   nombreArreglo = < ID >
   {
+    // guardar el nombre de la variable
     auxArreglo.setNombreVariable(nombreArreglo.toString());
+
+    // definir el scope de la variable
     String scope = "local";
     if(procedimientoActual.equals("program")){
+      // unicamente si el procedimiento actual es program, el scope de la variable es global
       scope = "global";    }
     auxArreglo.setScope(scope);
 
+	// dar de alta la variable en el directorio de variables del procedimiento actual
     if(!dirProcedimientos.getProcedimientos().get(procedimientoActual).agregarVariable(auxArreglo)){
+	  // si ya existe una variable con ese nombre, reportar error
       errorHandler(2,nombreArreglo.toString());    }  }  
    <CORIZQ > <CTEI > <CORDER > [<IGUAL > defarr()]
 }
@@ -239,15 +255,21 @@ void func():
 {String tipoFuncion; Token nombreProc;}
 {
  < FUNC > {
+   // crear un objeto procedimiento
    Procedimiento procAux = new Procedimiento(); }
  tipoFuncion = func1() {
+   // guardar el tipo de procedimiento
    procAux.setTipoProcedimiento(tipoFuncion); }
  nombreProc = < ID > {
+   // guardar el nombre del procedimiento en el objeto
    procAux.setNombreProcedimiento(nombreProc.toString());
 
+	// dar de alta el procedimiento en el directorio de procedimientos
    if (!dirProcedimientos.agregarProcedimiento(procAux)) {
+     	  // reportar error si ya existe un procedimiento con este nombre
 		  errorHandler(1, nombreProc.toString());
 	} else{
+	  // si se pudo guardar el procedimiento, asignar procedimientoActual con el id recien leido
    		procedimientoActual = nombreProc.toString();	}
  }
  <PARIZQ > param() < PARDER > body()
@@ -270,15 +292,19 @@ void param1():
 {String tipoParam; Token nombreParam;}
 {
   tipoParam = tipo()  {
+    // si el procedimiento actual no tiene ya un directorio de variables, crearlo
     if(dirProcedimientos.getProcedimientos().get(procedimientoActual).getVariables()==null){     dirProcedimientos.getProcedimientos().get(procedimientoActual).crearTablaDeVariables();
 	}
+	// crear objeto variable y guardar el tipo y scope
     Variable paramAux = new Variable();
     paramAux.setTipoVariable(tipoParam);
     paramAux.setScope("local");  }
    [< AMP >] nombreParam = <ID >   {
+     // guardar el nombre del parametro en el objeto
      paramAux.setNombreVariable(nombreParam.toString());
-
-     if(!dirProcedimientos.getProcedimientos().get(procedimientoActual).agregarVariable(paramAux)){		errorHandler(3, nombreParam.toString());
+	// dar de alta el parametro en el directorio de variables del procedimiento actual
+     if(!dirProcedimientos.getProcedimientos().get(procedimientoActual).agregarVariable(paramAux)){		// reportar error si ya existe una variable con ese nombre
+		errorHandler(3, nombreParam.toString());
      }   } 
 }
 
@@ -393,7 +419,16 @@ void llam():
 void main():
 {}
 {
-  < MAIN > <PARIZQ > < PARDER > body()
+  < MAIN >  {
+	// asignar procedimientoActual a main
+	procedimientoActual ="main";
+    // crear el procedimiento Main con nombre y tipo
+    Procedimiento mainProc = new Procedimiento();
+	mainProc.setNombreProcedimiento("main");
+	mainProc.setTipoProcedimiento("main");
+
+    // dar de alta el proc main en directorio de procedimientos
+    dirProcedimientos.agregarProcedimiento(mainProc);  } <PARIZQ > < PARDER > body()
 }
 
 void assignllam():
