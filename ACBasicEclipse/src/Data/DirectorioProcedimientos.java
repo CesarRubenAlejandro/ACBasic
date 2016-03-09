@@ -1,6 +1,7 @@
 package Data;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -9,18 +10,21 @@ import java.util.List;
  *
  */
 public class DirectorioProcedimientos {
-	private List<Procedimiento> procedimientos;
+	// mapa que guarda todos los procedimientos. 
+	// la llave String es el id del procedimiento
+	private HashMap<String, Procedimiento> procedimientos;
 
 	public DirectorioProcedimientos() {
 		super();
-		procedimientos = new ArrayList<Procedimiento> ();
+		procedimientos = new HashMap<String, Procedimiento> ();
 	}
 
-	public List<Procedimiento> getProcedimientos() {
+	public HashMap<String, Procedimiento> getProcedimientos() {
 		return procedimientos;
 	}
 
-	public void setProcedimientos(List<Procedimiento> procedimientos) {
+	public void setProcedimientos(HashMap<String, Procedimiento> procedimientos) {
 		this.procedimientos = procedimientos;
 	}
+
 }

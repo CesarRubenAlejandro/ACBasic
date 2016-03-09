@@ -1,6 +1,7 @@
 package Data;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -13,12 +14,13 @@ public class Procedimiento {
 	private String nombreProcedimiento;
 	// tipo (void, int, float, bool...) del procedimiento
 	private String tipoProcedimiento;
-	// lista de variables declaradas dentro de este procedimiento en el programa
-	private List<Variable> variables;
+	// mapa de variables declaradas dentro de este procedimiento en el programa
+	// la llave String es el id de la variable
+	private HashMap<String, Variable> variables;
 	
 	public Procedimiento() {
 		super();
-		variables = new ArrayList<Variable>();
+		variables = new HashMap<String,Variable>();
 	}
 
 	public String getNombreProcedimiento() {
@@ -37,13 +39,11 @@ public class Procedimiento {
 		this.tipoProcedimiento = tipoProcedimiento;
 	}
 
-	public List<Variable> getVariables() {
+	public HashMap<String, Variable> getVariables() {
 		return variables;
 	}
 
-	public void setVariables(List<Variable> variables) {
+	public void setVariables(HashMap<String, Variable> variables) {
 		this.variables = variables;
 	}
-	
-	
 }

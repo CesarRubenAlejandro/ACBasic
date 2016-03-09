@@ -128,7 +128,7 @@ int prog() :
 		Procedimiento programProc = new Procedimiento();
 		programProc.setNombreProcedimiento(idPrograma.toString());
 		programProc.setTipoProcedimiento("program");
-		dirProcedimientos.getProcedimientos().add(programProc);
+		dirProcedimientos.getProcedimientos().put(idPrograma.toString(),programProc);
    }
    <PYC > [vars()] (func())* main() {return 0; }
 }

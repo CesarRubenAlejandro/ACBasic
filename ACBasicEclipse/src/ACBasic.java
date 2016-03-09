@@ -46,7 +46,7 @@ public class ACBasic implements ACBasicConstants {
                 Procedimiento programProc = new Procedimiento();
                 programProc.setNombreProcedimiento(idPrograma.toString());
                 programProc.setTipoProcedimiento("program");
-                dirProcedimientos.getProcedimientos().add(programProc);
+                dirProcedimientos.getProcedimientos().put(idPrograma.toString(),programProc);
     jj_consume_token(PYC);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case VAR:
