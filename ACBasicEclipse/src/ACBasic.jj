@@ -7,9 +7,11 @@ options
 }
 
 PARSER_BEGIN(ACBasic)
-
+import Data.*;
 public class ACBasic
 {
+  private static DirectorioProcedimientos dirProcedimientos;
+  
   public static void main(String args []) throws ParseException
   {
     ACBasic parser = new ACBasic(System.in);
@@ -117,9 +119,18 @@ TOKEN :
 
 
 int prog() :
-{}
+{Token idPrograma;}
 {
-  < PROGRAM > <ID > <PYC > [vars()] (func())* main() { return 0; }
+  < PROGRAM >  {
+    dirProcedimientos = new DirectorioProcedimientos();  }
+   idPrograma =  <ID >
+   {
+		Procedimiento programProc = new Procedimiento();
+		programProc.setNombreProcedimiento(idPrograma.toString());
+		programProc.setTipoProcedimiento("program");
+		dirProcedimientos.getProcedimientos().add(programProc);
+   }
+   <PYC > [vars()] (func())* main() {return 0; }
 }
 
 void tipo():
