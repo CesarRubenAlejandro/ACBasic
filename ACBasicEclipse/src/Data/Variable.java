@@ -9,7 +9,7 @@ public class Variable {
 	// nombre de la variable (ID)
 	private String nombreVariable;
 	// define el tipo de la variable (int, float, bool, ...)
-	private String tipoVariable;
+	private int tipoVariable;
 	// define el alcance de la variable (global, local)
 	private String scope;
 	
@@ -17,7 +17,7 @@ public class Variable {
 		super();
 	}
 
-	public Variable(String nombreVariable, String tipoVariable, String scope) {
+	public Variable(String nombreVariable, int tipoVariable, String scope) {
 		super();
 		this.nombreVariable = nombreVariable;
 		this.tipoVariable = tipoVariable;
@@ -30,10 +30,10 @@ public class Variable {
 	public void setNombreVariable(String nombreVariable) {
 		this.nombreVariable = nombreVariable;
 	}
-	public String getTipoVariable() {
+	public int getTipoVariable() {
 		return tipoVariable;
 	}
-	public void setTipoVariable(String tipoVariable) {
+	public void setTipoVariable(int tipoVariable) {
 		this.tipoVariable = tipoVariable;
 	}
 	public String getScope() {

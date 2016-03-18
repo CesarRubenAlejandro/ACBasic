@@ -11,7 +11,7 @@ public class Procedimiento {
 	// nombre (id) del procedimiento
 	private String nombreProcedimiento;
 	// tipo (void, int, float, bool...) del procedimiento
-	private String tipoProcedimiento;
+	private int tipoProcedimiento;
 	// mapa de variables declaradas dentro de este procedimiento en el programa
 	// la llave String es el id de la variable
 	private HashMap<String, Variable> variables;
@@ -30,11 +30,11 @@ public class Procedimiento {
 		this.nombreProcedimiento = nombreProcedimiento;
 	}
 
-	public String getTipoProcedimiento() {
+	public int getTipoProcedimiento() {
 		return tipoProcedimiento;
 	}
 
-	public void setTipoProcedimiento(String tipoProcedimiento) {
+	public void setTipoProcedimiento(int tipoProcedimiento) {
 		this.tipoProcedimiento = tipoProcedimiento;
 	}
 

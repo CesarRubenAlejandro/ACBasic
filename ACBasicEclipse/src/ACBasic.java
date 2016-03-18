@@ -65,7 +65,7 @@ public class ACBasic implements ACBasicConstants {
                 // crear un objeto procedimiento auxiliar para guardar info del procedimiento program
                 Procedimiento programProc = new Procedimiento();
                 programProc.setNombreProcedimiento(idPrograma.toString());
-                programProc.setTipoProcedimiento("program");
+                programProc.setTipoProcedimiento(Codigos.PROGRAM);
                 // guardar el procedimiento program en el directorio de procedimientos
                 if (!dirProcedimientos.agregarProcedimiento(programProc)) {
                   // si ya existe un procedimiento con ese nombre, reportar error
@@ -95,27 +95,27 @@ public class ACBasic implements ACBasicConstants {
     main();
   }
 
-  static final public String tipo() throws ParseException {
+  static final public int tipo() throws ParseException {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case INT:
       jj_consume_token(INT);
-           {if (true) return "int";}
+           {if (true) return Codigos.INT;}
       break;
     case FLOAT:
       jj_consume_token(FLOAT);
-               {if (true) return "float";}
+               {if (true) return Codigos.FLOAT;}
       break;
     case CHAR:
       jj_consume_token(CHAR);
-              {if (true) return "char";}
+              {if (true) return Codigos.CHAR;}
       break;
     case STRING:
       jj_consume_token(STRING);
-                {if (true) return "string";}
+                {if (true) return Codigos.STRING;}
       break;
     case BOOL:
       jj_consume_token(BOOL);
-              {if (true) return "bool";}
+              {if (true) return Codigos.BOOL;}
       break;
     default:
       jj_la1[2] = jj_gen;
@@ -217,7 +217,7 @@ public class ACBasic implements ACBasicConstants {
   }
 
   static final public void vars2() throws ParseException {
- String tipoVariable; Token nombreVariable;
+ int tipoVariable; Token nombreVariable;
     tipoVariable = tipo();
     nombreVariable = jj_consume_token(ID);
     // asignar el tipo de scope de la variable
@@ -273,7 +273,7 @@ public class ACBasic implements ACBasicConstants {
   }
 
   static final public void vars3() throws ParseException {
- String tipoArreglo; Token nombreArreglo;
+ int tipoArreglo; Token nombreArreglo;
     jj_consume_token(ARRAY);
     // crear objeto variable
     Variable auxArreglo = new Variable();
@@ -312,7 +312,7 @@ public class ACBasic implements ACBasicConstants {
   }
 
   static final public void func() throws ParseException {
- String tipoFuncion; Token nombreProc;
+ int tipoFuncion; Token nombreProc;
     jj_consume_token(FUNC);
    // crear un objeto procedimiento
    Procedimiento procAux = new Procedimiento();
@@ -337,8 +337,8 @@ public class ACBasic implements ACBasicConstants {
     body();
   }
 
-  static final public String func1() throws ParseException {
- String tipoFuncion;
+  static final public int func1() throws ParseException {
+ int tipoFuncion;
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case INT:
     case CHAR:
@@ -350,7 +350,7 @@ public class ACBasic implements ACBasicConstants {
       break;
     case VOID:
       jj_consume_token(VOID);
-             {if (true) return "void";}
+             {if (true) return Codigos.VOID;}
       break;
     default:
       jj_la1[11] = jj_gen;
@@ -389,7 +389,7 @@ public class ACBasic implements ACBasicConstants {
   }
 
   static final public void param1() throws ParseException {
- String tipoParam; Token nombreParam;
+ int tipoParam; Token nombreParam;
     tipoParam = tipo();
     // si el procedimiento actual no tiene ya un directorio de variables, crearlo
     if(dirProcedimientos.getProcedimientos().get(procedimientoActual).getVariables()==null){
@@ -804,7 +804,7 @@ public class ACBasic implements ACBasicConstants {
     // crear el procedimiento Main con nombre y tipo
     Procedimiento mainProc = new Procedimiento();
         mainProc.setNombreProcedimiento("main");
-        mainProc.setTipoProcedimiento("main");
+        mainProc.setTipoProcedimiento(Codigos.MAIN);
 
     // dar de alta el proc main en directorio de procedimientos
     dirProcedimientos.agregarProcedimiento(mainProc);

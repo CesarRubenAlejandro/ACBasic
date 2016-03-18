@@ -146,7 +146,7 @@ void prog() :
 		// crear un objeto procedimiento auxiliar para guardar info del procedimiento program
 		Procedimiento programProc = new Procedimiento();
 		programProc.setNombreProcedimiento(idPrograma.toString());
-		programProc.setTipoProcedimiento("program");
+		programProc.setTipoProcedimiento(Codigos.PROGRAM);
 		// guardar el procedimiento program en el directorio de procedimientos
 		if (!dirProcedimientos.agregarProcedimiento(programProc)) {
 		  // si ya existe un procedimiento con ese nombre, reportar error
@@ -155,14 +155,14 @@ void prog() :
    <PYC > [vars()] (func())* main()
 }
 
-String tipo():
+int tipo():
 {}
 {
-  < INT > {return "int";}
-  | < FLOAT > {return "float";}
-  | < CHAR > {return "char";}
-  | < STRING > {return "string";}
-  | < BOOL > {return "bool";}
+  < INT > {return Codigos.INT;}
+  | < FLOAT > {return Codigos.FLOAT;}
+  | < CHAR > {return Codigos.CHAR;}
+  | < STRING > {return Codigos.STRING;}
+  | < BOOL > {return Codigos.BOOL;}
 }
 
 void cte():
@@ -193,7 +193,7 @@ void vars1():
 }
 
 void vars2():
-{String tipoVariable; Token nombreVariable;}
+{int tipoVariable; Token nombreVariable;}
 {
   tipoVariable = tipo() nombreVariable=< ID >
   {
@@ -221,7 +221,7 @@ void vars2():
 }
 
 void vars3():
-{String tipoArreglo; Token nombreArreglo;}
+{int tipoArreglo; Token nombreArreglo;}
 {
   < ARRAY >
   {
@@ -252,7 +252,7 @@ void vars3():
 
 
 void func():
-{String tipoFuncion; Token nombreProc;}
+{int tipoFuncion; Token nombreProc;}
 {
  < FUNC > {
    // crear un objeto procedimiento
@@ -275,11 +275,11 @@ void func():
  <PARIZQ > param() < PARDER > body()
 }
 
-String func1():
-{String tipoFuncion;}
+int func1():
+{int tipoFuncion;}
 {
  tipoFuncion = tipo() {return tipoFuncion;}
- | < VOID > {return "void";}
+ | < VOID > {return Codigos.VOID;}
 }
  
 void param():
@@ -289,7 +289,7 @@ void param():
 }
 
 void param1():
-{String tipoParam; Token nombreParam;}
+{int tipoParam; Token nombreParam;}
 {
   tipoParam = tipo()  {
     // si el procedimiento actual no tiene ya un directorio de variables, crearlo
@@ -425,7 +425,7 @@ void main():
     // crear el procedimiento Main con nombre y tipo
     Procedimiento mainProc = new Procedimiento();
 	mainProc.setNombreProcedimiento("main");
-	mainProc.setTipoProcedimiento("main");
+	mainProc.setTipoProcedimiento(Codigos.MAIN);
 
     // dar de alta el proc main en directorio de procedimientos
     dirProcedimientos.agregarProcedimiento(mainProc);  } <PARIZQ > < PARDER > body()
