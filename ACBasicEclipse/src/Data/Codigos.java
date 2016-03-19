@@ -26,9 +26,21 @@ public class Codigos {
 	
 	// operadores logicos (and or)
 	public static final int OPLOGIC = 5;
+	public static final int AND = 50;
+	public static final int OR = 51;
 	
-	// operadores relacionales ( > < >= <= != ==)
+	// operadores relacionales ( > < >= <= == !=)
 	public static final int OPREL = 6;
+	public static final int MAYOR = 60;
+	public static final int MENOR = 61;
+	public static final int MAYORIG = 62;
+	public static final int MENORIG = 63;
+	public static final int IGUAL = 64;
+	public static final int DIFERENTE = 65;
 	
 	public static final int NOT = 7;
+	
+	public static final int PRINT = 8;
+	public static final int READ = 9;
+	
 }
