@@ -18,6 +18,8 @@ public class ACBasic
   private static Stack <Integer> pilaOperandos;
   private static Stack <Integer> pilaTipos;
   private static CuboSemantico cuboSemantico;
+  private static int[][] matrizCuadruplos;
+  private static int contadorCuadruplo; 
   
   public static void main(String args []) throws ParseException {
     ACBasic parser = new ACBasic(System.in);
@@ -25,6 +27,8 @@ public class ACBasic
 	pilaOperandos = new Stack<Integer>();
 	pilaTipos = new Stack<Integer>();
 	cuboSemantico = new CuboSemantico();
+	matrizCuadruplos = new int[1000][4];
+	contadorCuadruplo = 0;
 
     System.out.println("Reading from standard input...");
     try
@@ -342,7 +346,34 @@ void assign():
 void exp():
 {}
 {
-  e1() [(< AND > | < OR >) e1()]
+  e1()
+  {
+    // revisar si el tope es AND u OR
+    if (pilaOperadores.peek()== Codigos.AND || pilaOperadores.peek()== Codigos.OR) {
+		int operador = pilaOperadores.pop();
+		int operando2 = pilaOperandos.pop();
+		int operando1 = pilaOperandos.pop();
+		int tipo2 = pilaTipos.pop();
+		int tipo1 = pilaTipos.pop();
+		int tipoRes = cuboSemantico.getCubo()[tipo1][tipo2][operador];
+		// revisar si combinacion de tipos es permitida
+		if(tipoRes != Codigos.ERROR) {
+			// generar cuadruplo
+		  	matrizCuadruplos[contadorCuadruplo][0] = operador;
+		  	matrizCuadruplos[contadorCuadruplo][1] = operando1;
+		  	matrizCuadruplos[contadorCuadruplo][2] = operando2;
+		  	int direccionRes = ManejadorMemoria.getMemoriaTemporal(tipoRes);
+		  	matrizCuadruplos[contadorCuadruplo][3] = direccionRes;
+		  	//guardar resultado en pila operandos
+		  	pilaOperandos.push(direccionRes);
+		  	pilaTipos.push(tipoRes);
+		} else {
+		  // ERROR
+		}	
+    }   
+  }
+  ((< AND > {pilaOperadores.push(Codigos.AND);}
+  | < OR >{pilaOperadores.push(Codigos.OR);}) e1())*
 }
 
 void e1():
@@ -354,7 +385,34 @@ void e1():
 void e2():
 {}
 {
-  term() ((< MAS > | < MENOS >) term())*
+  term()
+{
+    // revisar si el tope es + o -
+    if (pilaOperadores.peek()== Codigos.SUMA || pilaOperadores.peek()== Codigos.RESTA) {
+		int operador = pilaOperadores.pop();
+		int operando2 = pilaOperandos.pop();
+		int operando1 = pilaOperandos.pop();
+		int tipo2 = pilaTipos.pop();
+		int tipo1 = pilaTipos.pop();
+		int tipoRes = cuboSemantico.getCubo()[tipo1][tipo2][operador];
+		// revisar si combinacion de tipos es permitida
+		if(tipoRes != Codigos.ERROR) {
+			// generar cuadruplo
+		  	matrizCuadruplos[contadorCuadruplo][0] = operador;
+		  	matrizCuadruplos[contadorCuadruplo][1] = operando1;
+		  	matrizCuadruplos[contadorCuadruplo][2] = operando2;
+		  	int direccionRes = ManejadorMemoria.getMemoriaTemporal(tipoRes);
+		  	matrizCuadruplos[contadorCuadruplo][3] = direccionRes;
+		  	//guardar resultado en pila operandos
+		  	pilaOperandos.push(direccionRes);
+		  	pilaTipos.push(tipoRes);
+		} else {
+		  // ERROR
+		}	
+    }    
+  }
+  ((< MAS > {pilaOperadores.push(Codigos.SUMA);}
+  | < MENOS > {pilaOperadores.push(Codigos.RESTA);}) term())*
 }
 
 void term():
@@ -368,13 +426,20 @@ void term():
 		int operando1 = pilaOperandos.pop();
 		int tipo2 = pilaTipos.pop();
 		int tipo1 = pilaTipos.pop();
+		int tipoRes = cuboSemantico.getCubo()[tipo1][tipo2][operador];
 		// revisar si combinacion de tipos es permitida
-
-		if(cuboSemantico.getCubo()[tipo1][tipo2][operador]!= Codigos.ERROR) {
-		  // generar cuadruplo		} else {
-		  // ERROR		}
-		
-    }         }
+		if(tipoRes != Codigos.ERROR) {
+			// generar cuadruplo
+		  	matrizCuadruplos[contadorCuadruplo][0] = operador;
+		  	matrizCuadruplos[contadorCuadruplo][1] = operando1;
+		  	matrizCuadruplos[contadorCuadruplo][2] = operando2;
+		  	int direccionRes = ManejadorMemoria.getMemoriaTemporal(tipoRes);
+		  	matrizCuadruplos[contadorCuadruplo][3] = direccionRes;
+		  	//guardar resultado en pila operandos
+		  	pilaOperandos.push(direccionRes);
+		  	pilaTipos.push(tipoRes);		} else {
+		  // ERROR		}	
+    }     }
   ((< POR > {pilaOperadores.push(Codigos.MULT);}
   | < ENTRE >{pilaOperadores.push(Codigos.DIV);}) fact())*
 }

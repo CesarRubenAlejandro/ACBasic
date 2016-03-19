@@ -8,6 +8,8 @@ public class ACBasic implements ACBasicConstants {
   private static Stack <Integer> pilaOperandos;
   private static Stack <Integer> pilaTipos;
   private static CuboSemantico cuboSemantico;
+  private static int[][] matrizCuadruplos;
+  private static int contadorCuadruplo;
 
   public static void main(String args []) throws ParseException {
     ACBasic parser = new ACBasic(System.in);
@@ -15,6 +17,8 @@ public class ACBasic implements ACBasicConstants {
         pilaOperandos = new Stack<Integer>();
         pilaTipos = new Stack<Integer>();
         cuboSemantico = new CuboSemantico();
+        matrizCuadruplos = new int[1000][4];
+        contadorCuadruplo = 0;
 
     System.out.println("Reading from standard input...");
     try
@@ -510,26 +514,55 @@ public class ACBasic implements ACBasicConstants {
 
   static final public void exp() throws ParseException {
     e1();
-    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-    case AND:
-    case OR:
+    // revisar si el tope es AND u OR
+    if (pilaOperadores.peek()== Codigos.AND || pilaOperadores.peek()== Codigos.OR) {
+                int operador = pilaOperadores.pop();
+                int operando2 = pilaOperandos.pop();
+                int operando1 = pilaOperandos.pop();
+                int tipo2 = pilaTipos.pop();
+                int tipo1 = pilaTipos.pop();
+                int tipoRes = cuboSemantico.getCubo()[tipo1][tipo2][operador];
+                // revisar si combinacion de tipos es permitida
+                if(tipoRes != Codigos.ERROR) {
+                        // generar cuadruplo
+                        matrizCuadruplos[contadorCuadruplo][0] = operador;
+                        matrizCuadruplos[contadorCuadruplo][1] = operando1;
+                        matrizCuadruplos[contadorCuadruplo][2] = operando2;
+                        int direccionRes = ManejadorMemoria.getMemoriaTemporal(tipoRes);
+                        matrizCuadruplos[contadorCuadruplo][3] = direccionRes;
+                        //guardar resultado en pila operandos
+                        pilaOperandos.push(direccionRes);
+                        pilaTipos.push(tipoRes);
+                } else {
+                  // ERROR
+                }
+    }
+    label_7:
+    while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case AND:
-        jj_consume_token(AND);
-        break;
       case OR:
-        jj_consume_token(OR);
+        ;
         break;
       default:
         jj_la1[20] = jj_gen;
+        break label_7;
+      }
+      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+      case AND:
+        jj_consume_token(AND);
+             pilaOperadores.push(Codigos.AND);
+        break;
+      case OR:
+        jj_consume_token(OR);
+           pilaOperadores.push(Codigos.OR);
+        break;
+      default:
+        jj_la1[21] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
       e1();
-      break;
-    default:
-      jj_la1[21] = jj_gen;
-      ;
     }
   }
 
@@ -576,7 +609,30 @@ public class ACBasic implements ACBasicConstants {
 
   static final public void e2() throws ParseException {
     term();
-    label_7:
+    // revisar si el tope es + o -
+    if (pilaOperadores.peek()== Codigos.SUMA || pilaOperadores.peek()== Codigos.RESTA) {
+                int operador = pilaOperadores.pop();
+                int operando2 = pilaOperandos.pop();
+                int operando1 = pilaOperandos.pop();
+                int tipo2 = pilaTipos.pop();
+                int tipo1 = pilaTipos.pop();
+                int tipoRes = cuboSemantico.getCubo()[tipo1][tipo2][operador];
+                // revisar si combinacion de tipos es permitida
+                if(tipoRes != Codigos.ERROR) {
+                        // generar cuadruplo
+                        matrizCuadruplos[contadorCuadruplo][0] = operador;
+                        matrizCuadruplos[contadorCuadruplo][1] = operando1;
+                        matrizCuadruplos[contadorCuadruplo][2] = operando2;
+                        int direccionRes = ManejadorMemoria.getMemoriaTemporal(tipoRes);
+                        matrizCuadruplos[contadorCuadruplo][3] = direccionRes;
+                        //guardar resultado en pila operandos
+                        pilaOperandos.push(direccionRes);
+                        pilaTipos.push(tipoRes);
+                } else {
+                  // ERROR
+                }
+    }
+    label_8:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case MAS:
@@ -585,14 +641,16 @@ public class ACBasic implements ACBasicConstants {
         break;
       default:
         jj_la1[24] = jj_gen;
-        break label_7;
+        break label_8;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case MAS:
         jj_consume_token(MAS);
+             pilaOperadores.push(Codigos.SUMA);
         break;
       case MENOS:
         jj_consume_token(MENOS);
+               pilaOperadores.push(Codigos.RESTA);
         break;
       default:
         jj_la1[25] = jj_gen;
@@ -612,16 +670,23 @@ public class ACBasic implements ACBasicConstants {
                 int operando1 = pilaOperandos.pop();
                 int tipo2 = pilaTipos.pop();
                 int tipo1 = pilaTipos.pop();
+                int tipoRes = cuboSemantico.getCubo()[tipo1][tipo2][operador];
                 // revisar si combinacion de tipos es permitida
-
-                if(cuboSemantico.getCubo()[tipo1][tipo2][operador]!= Codigos.ERROR) {
-                  // generar cuadruplo
+                if(tipoRes != Codigos.ERROR) {
+                        // generar cuadruplo
+                        matrizCuadruplos[contadorCuadruplo][0] = operador;
+                        matrizCuadruplos[contadorCuadruplo][1] = operando1;
+                        matrizCuadruplos[contadorCuadruplo][2] = operando2;
+                        int direccionRes = ManejadorMemoria.getMemoriaTemporal(tipoRes);
+                        matrizCuadruplos[contadorCuadruplo][3] = direccionRes;
+                        //guardar resultado en pila operandos
+                        pilaOperandos.push(direccionRes);
+                        pilaTipos.push(tipoRes);
                 } else {
                   // ERROR
                 }
-
     }
-    label_8:
+    label_9:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case POR:
@@ -630,7 +695,7 @@ public class ACBasic implements ACBasicConstants {
         break;
       default:
         jj_la1[26] = jj_gen;
-        break label_8;
+        break label_9;
       }
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case POR:
@@ -738,7 +803,7 @@ public class ACBasic implements ACBasicConstants {
   static final public void fact5() throws ParseException {
     jj_consume_token(PARIZQ);
     exp();
-    label_9:
+    label_10:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case COMA:
@@ -746,7 +811,7 @@ public class ACBasic implements ACBasicConstants {
         break;
       default:
         jj_la1[32] = jj_gen;
-        break label_9;
+        break label_10;
       }
       jj_consume_token(COMA);
       exp();
@@ -760,7 +825,7 @@ public class ACBasic implements ACBasicConstants {
     exp();
     jj_consume_token(PARDER);
     body();
-    label_10:
+    label_11:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case ELIF:
@@ -768,7 +833,7 @@ public class ACBasic implements ACBasicConstants {
         break;
       default:
         jj_la1[33] = jj_gen;
-        break label_10;
+        break label_11;
       }
       jj_consume_token(ELIF);
       jj_consume_token(PARIZQ);
@@ -824,7 +889,7 @@ public class ACBasic implements ACBasicConstants {
   static final public void llam() throws ParseException {
     jj_consume_token(PARIZQ);
     exp();
-    label_11:
+    label_12:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case COMA:
@@ -832,7 +897,7 @@ public class ACBasic implements ACBasicConstants {
         break;
       default:
         jj_la1[36] = jj_gen;
-        break label_11;
+        break label_12;
       }
       jj_consume_token(COMA);
       exp();
