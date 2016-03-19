@@ -37,6 +37,7 @@ public class Variable {
 		return tipoVariable;
 	}
 	public void setTipoVariable(int tipoVariable) {
+		setDireccionVariable(ManejadorMemoria.getMemoria(tipoVariable));
 		this.tipoVariable = tipoVariable;
 	}
 	public String getScope() {
