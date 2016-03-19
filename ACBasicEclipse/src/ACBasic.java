@@ -20,7 +20,8 @@ public class ACBasic implements ACBasicConstants {
           for (String keyVariable : actual.getVariables().keySet()) {
                         Variable varActual = actual.getVariables().get(keyVariable);
                         System.out.print(varActual.getNombreVariable() + ": ");
-                        System.out.println(varActual.getTipoVariable());
+                        System.out.print(varActual.getTipoVariable() + ": ");
+                        System.out.println(varActual.getDireccionVariable());
           }
       }
 

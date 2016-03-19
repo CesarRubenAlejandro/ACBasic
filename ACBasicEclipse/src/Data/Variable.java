@@ -12,6 +12,8 @@ public class Variable {
 	private int tipoVariable;
 	// define el alcance de la variable (global, local)
 	private String scope;
+	//define la direccion logico 
+	private int direccionVariable;
 	
 	public Variable() {
 		super();
@@ -22,6 +24,7 @@ public class Variable {
 		this.nombreVariable = nombreVariable;
 		this.tipoVariable = tipoVariable;
 		this.scope = scope;
+		this.direccionVariable = ManejadorMemoria.getMemoria(tipoVariable);
 	}
 	
 	public String getNombreVariable() {
@@ -41,6 +44,14 @@ public class Variable {
 	}
 	public void setScope(String scope) {
 		this.scope = scope;
+	}
+
+	public int getDireccionVariable() {
+		return direccionVariable;
+	}
+
+	public void setDireccionVariable(int direccionVariable) {
+		this.direccionVariable = direccionVariable;
 	}
 	
 }
