@@ -9,13 +9,22 @@ options
 
 PARSER_BEGIN(ACBasic)
 import Data.*;
+import java.util.Stack;
 public class ACBasic
 {
   private static DirectorioProcedimientos dirProcedimientos;
   private static String procedimientoActual;
+  private static Stack <Integer> pilaOperadores;
+  private static Stack <Integer> pilaOperandos;
+  private static Stack <Integer> pilaTipos;
+  private static CuboSemantico cuboSemantico;
   
   public static void main(String args []) throws ParseException {
     ACBasic parser = new ACBasic(System.in);
+	pilaOperadores = new Stack<Integer>();
+	pilaOperandos = new Stack<Integer>();
+	pilaTipos = new Stack<Integer>();
+	cuboSemantico = new CuboSemantico();
 
     System.out.println("Reading from standard input...");
     try
@@ -273,7 +282,10 @@ void func():
 	  // si se pudo guardar el procedimiento, asignar procedimientoActual con el id recien leido
    		procedimientoActual = nombreProc.toString();	}
  }
- <PARIZQ > param() < PARDER > body()
+ <PARIZQ > param() < PARDER > body() {
+   // borrar tabla de variables para el procedimiento actual
+   dirProcedimientos.getProcedimientos().get(procedimientoActual).setVariables(null); }
+ 
 }
 
 int func1():
@@ -348,7 +360,23 @@ void e2():
 void term():
 {}
 {
-  fact() ((< POR > | < ENTRE >) fact())*
+  fact()  {
+    // revisar si el tope es * o /
+    if (pilaOperadores.peek()== Codigos.MULT || pilaOperadores.peek()== Codigos.DIV) {
+		int operador = pilaOperadores.pop();
+		int operando2 = pilaOperandos.pop();
+		int operando1 = pilaOperandos.pop();
+		int tipo2 = pilaTipos.pop();
+		int tipo1 = pilaTipos.pop();
+		// revisar si combinacion de tipos es permitida
+
+		if(cuboSemantico.getCubo()[tipo1][tipo2][operador]!= Codigos.ERROR) {
+		  // generar cuadruplo		} else {
+		  // ERROR		}
+		
+    }         }
+  ((< POR > {pilaOperadores.push(Codigos.MULT);}
+  | < ENTRE >{pilaOperadores.push(Codigos.DIV);}) fact())*
 }
 
 void fact():
@@ -370,15 +398,29 @@ void fact2():
 }
 
 void fact3():
-{}
+{Token id;}
 {
- < ID > [(fact4() | fact5())] 
+ id = < ID > {
+   // buscar que exista el id
+   Variable varActual = dirProcedimientos.obtenerVariable(procedimientoActual, id.toString()); 
+   if ( varActual == null) {
+     // ERROR   } else {
+     // meter direccion y tipo a las pilas
+     pilaOperandos.push(varActual.getDireccionVariable());
+     pilaTipos.push(varActual.getTipoVariable());   }
+    } [(fact4() | fact5())] 
 }
 
 void fact4():
 {}
 {
-  < CORIZQ > exp() < CORDER >
+  < CORIZQ >
+  {
+    // meter a pila fondo falso
+	pilaOperadores.push(Codigos.FONDOFALSO);     }
+  exp() < CORDER >  {
+    // sacar fondo falso
+    pilaOperadores.pop();  }
 }
 
 void fact5():

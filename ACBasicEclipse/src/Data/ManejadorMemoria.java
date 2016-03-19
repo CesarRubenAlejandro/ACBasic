@@ -2,6 +2,7 @@ package Data;
 
 public class ManejadorMemoria {
 
+	// variables
 	private static int contadorInt = 1000;
 	private static int contadorFloat = 2000;
 	private static int contadorChar = 3000;

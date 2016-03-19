@@ -37,5 +37,31 @@ public class DirectorioProcedimientos {
 			return true;
 		}
 	}
+	
+	/**
+	 * Metodo para revisar si existe la variable en el procedimiento actual o global
+	 * @param nombreProcActual
+	 * @param nombreVariable
+	 * @return
+	 */
+	public boolean existeVariable(String nombreProcActual, String nombreVariable){
+		return this.procedimientos.get(nombreProcActual).getVariables().containsKey(nombreVariable) ||
+				this.procedimientos.get("program").getVariables().containsKey(nombreVariable);
+	}
 
+	/**
+	 * Metodo para obtener una variable si es que existe
+	 * @param nombreProcActual
+	 * @param nombreVariable
+	 * @return
+	 */
+	public Variable obtenerVariable(String nombreProcActual, String nombreVariable){
+		if( this.procedimientos.get(nombreProcActual).getVariables().containsKey(nombreVariable)){
+			return this.procedimientos.get(nombreProcActual).getVariables().get(nombreVariable);
+		} else if (this.procedimientos.get("program").getVariables().containsKey(nombreVariable)){
+			return this.procedimientos.get("program").getVariables().get(nombreVariable);
+		} else{
+			return null;
+		}
+	}
 }

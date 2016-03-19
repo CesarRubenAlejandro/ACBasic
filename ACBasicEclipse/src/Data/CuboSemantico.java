@@ -2,7 +2,7 @@ package Data;
 
 public class CuboSemantico {
 	private int[][][] cubo;
-	
+
 	public CuboSemantico(){
 		cubo = new int [5][5][7];
 		// llenado del cubo semantico
@@ -235,6 +235,14 @@ public class CuboSemantico {
 		cubo[Codigos.BOOL][Codigos.BOOL][Codigos.ASIGN] = Codigos.BOOL;
 		cubo[Codigos.BOOL][Codigos.BOOL][Codigos.OPLOGIC] = Codigos.BOOL;
 		cubo[Codigos.BOOL][Codigos.BOOL][Codigos.OPREL] = Codigos.ERROR;
+	}
+	
+	public int[][][] getCubo() {
+		return cubo;
+	}
+
+	public void setCubo(int[][][] cubo) {
+		this.cubo = cubo;
 	}
 	
 }

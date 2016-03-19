@@ -43,4 +43,6 @@ public class Codigos {
 	public static final int PRINT = 8;
 	public static final int READ = 9;
 	
+	public static final int FONDOFALSO = 10;
+	
 }
