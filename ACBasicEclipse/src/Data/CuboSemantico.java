@@ -145,6 +145,96 @@ public class CuboSemantico {
 		cubo[Codigos.CHAR][Codigos.BOOL][Codigos.OPREL] = Codigos.ERROR;
 		
 		// STRING lado izquierdo
+		// string con int
+		cubo[Codigos.STRING][Codigos.INT][Codigos.SUMA] = Codigos.ERROR;
+		cubo[Codigos.STRING][Codigos.INT][Codigos.RESTA] = Codigos.ERROR;
+		cubo[Codigos.STRING][Codigos.INT][Codigos.DIV] = Codigos.ERROR;
+		cubo[Codigos.STRING][Codigos.INT][Codigos.MULT] = Codigos.ERROR;
+		cubo[Codigos.STRING][Codigos.INT][Codigos.ASIGN] = Codigos.ERROR;
+		cubo[Codigos.STRING][Codigos.INT][Codigos.OPLOGIC] = Codigos.ERROR;
+		cubo[Codigos.STRING][Codigos.INT][Codigos.OPREL] = Codigos.ERROR;
+		
+		// string con float
+		cubo[Codigos.STRING][Codigos.FLOAT][Codigos.SUMA] = Codigos.ERROR;
+		cubo[Codigos.STRING][Codigos.FLOAT][Codigos.RESTA] = Codigos.ERROR;
+		cubo[Codigos.STRING][Codigos.FLOAT][Codigos.DIV] = Codigos.ERROR;
+		cubo[Codigos.STRING][Codigos.FLOAT][Codigos.MULT] = Codigos.ERROR;
+		cubo[Codigos.STRING][Codigos.FLOAT][Codigos.ASIGN] = Codigos.ERROR;
+		cubo[Codigos.STRING][Codigos.FLOAT][Codigos.OPLOGIC] = Codigos.ERROR;
+		cubo[Codigos.STRING][Codigos.FLOAT][Codigos.OPREL] = Codigos.ERROR;
+		
+		// string con char
+		cubo[Codigos.STRING][Codigos.CHAR][Codigos.SUMA] = Codigos.ERROR;
+		cubo[Codigos.STRING][Codigos.CHAR][Codigos.RESTA] = Codigos.ERROR;
+		cubo[Codigos.STRING][Codigos.CHAR][Codigos.DIV] = Codigos.ERROR;
+		cubo[Codigos.STRING][Codigos.CHAR][Codigos.MULT] = Codigos.ERROR;
+		cubo[Codigos.STRING][Codigos.CHAR][Codigos.ASIGN] = Codigos.ERROR;
+		cubo[Codigos.STRING][Codigos.CHAR][Codigos.OPLOGIC] = Codigos.ERROR;
+		cubo[Codigos.STRING][Codigos.CHAR][Codigos.OPREL] = Codigos.ERROR;
+		
+		// string con string
+		cubo[Codigos.STRING][Codigos.STRING][Codigos.SUMA] = Codigos.STRING;
+		cubo[Codigos.STRING][Codigos.STRING][Codigos.RESTA] = Codigos.ERROR;
+		cubo[Codigos.STRING][Codigos.STRING][Codigos.DIV] = Codigos.ERROR;
+		cubo[Codigos.STRING][Codigos.STRING][Codigos.MULT] = Codigos.ERROR;
+		cubo[Codigos.STRING][Codigos.STRING][Codigos.ASIGN] = Codigos.STRING;
+		cubo[Codigos.STRING][Codigos.STRING][Codigos.OPLOGIC] = Codigos.ERROR;
+		cubo[Codigos.STRING][Codigos.STRING][Codigos.OPREL] = Codigos.ERROR;
+		
+		// string con bool
+		cubo[Codigos.STRING][Codigos.BOOL][Codigos.SUMA] = Codigos.ERROR;
+		cubo[Codigos.STRING][Codigos.BOOL][Codigos.RESTA] = Codigos.ERROR;
+		cubo[Codigos.STRING][Codigos.BOOL][Codigos.DIV] = Codigos.ERROR;
+		cubo[Codigos.STRING][Codigos.BOOL][Codigos.MULT] = Codigos.ERROR;
+		cubo[Codigos.STRING][Codigos.BOOL][Codigos.ASIGN] = Codigos.ERROR;
+		cubo[Codigos.STRING][Codigos.BOOL][Codigos.OPLOGIC] = Codigos.ERROR;
+		cubo[Codigos.STRING][Codigos.BOOL][Codigos.OPREL] = Codigos.ERROR;
+		
+		// BOOL lado izquierdo
+		// bool con int
+		cubo[Codigos.BOOL][Codigos.INT][Codigos.SUMA] = Codigos.ERROR;
+		cubo[Codigos.BOOL][Codigos.INT][Codigos.RESTA] = Codigos.ERROR;
+		cubo[Codigos.BOOL][Codigos.INT][Codigos.DIV] = Codigos.ERROR;
+		cubo[Codigos.BOOL][Codigos.INT][Codigos.MULT] = Codigos.ERROR;
+		cubo[Codigos.BOOL][Codigos.INT][Codigos.ASIGN] = Codigos.ERROR;
+		cubo[Codigos.BOOL][Codigos.INT][Codigos.OPLOGIC] = Codigos.ERROR;
+		cubo[Codigos.BOOL][Codigos.INT][Codigos.OPREL] = Codigos.ERROR;
+		
+		// bool con float
+		cubo[Codigos.BOOL][Codigos.FLOAT][Codigos.SUMA] = Codigos.ERROR;
+		cubo[Codigos.BOOL][Codigos.FLOAT][Codigos.RESTA] = Codigos.ERROR;
+		cubo[Codigos.BOOL][Codigos.FLOAT][Codigos.DIV] = Codigos.ERROR;
+		cubo[Codigos.BOOL][Codigos.FLOAT][Codigos.MULT] = Codigos.ERROR;
+		cubo[Codigos.BOOL][Codigos.FLOAT][Codigos.ASIGN] = Codigos.ERROR;
+		cubo[Codigos.BOOL][Codigos.FLOAT][Codigos.OPLOGIC] = Codigos.ERROR;
+		cubo[Codigos.BOOL][Codigos.FLOAT][Codigos.OPREL] = Codigos.ERROR;
+		
+		// bool con char
+		cubo[Codigos.BOOL][Codigos.CHAR][Codigos.SUMA] = Codigos.ERROR;
+		cubo[Codigos.BOOL][Codigos.CHAR][Codigos.RESTA] = Codigos.ERROR;
+		cubo[Codigos.BOOL][Codigos.CHAR][Codigos.DIV] = Codigos.ERROR;
+		cubo[Codigos.BOOL][Codigos.CHAR][Codigos.MULT] = Codigos.ERROR;
+		cubo[Codigos.BOOL][Codigos.CHAR][Codigos.ASIGN] = Codigos.ERROR;
+		cubo[Codigos.BOOL][Codigos.CHAR][Codigos.OPLOGIC] = Codigos.ERROR;
+		cubo[Codigos.BOOL][Codigos.CHAR][Codigos.OPREL] = Codigos.ERROR;
+		
+		// bool con string
+		cubo[Codigos.BOOL][Codigos.STRING][Codigos.SUMA] = Codigos.ERROR;
+		cubo[Codigos.BOOL][Codigos.STRING][Codigos.RESTA] = Codigos.ERROR;
+		cubo[Codigos.BOOL][Codigos.STRING][Codigos.DIV] = Codigos.ERROR;
+		cubo[Codigos.BOOL][Codigos.STRING][Codigos.MULT] = Codigos.ERROR;
+		cubo[Codigos.BOOL][Codigos.STRING][Codigos.ASIGN] = Codigos.ERROR;
+		cubo[Codigos.BOOL][Codigos.STRING][Codigos.OPLOGIC] = Codigos.ERROR;
+		cubo[Codigos.BOOL][Codigos.STRING][Codigos.OPREL] = Codigos.ERROR;
+		
+		// bool con bool
+		cubo[Codigos.BOOL][Codigos.BOOL][Codigos.SUMA] = Codigos.ERROR;
+		cubo[Codigos.BOOL][Codigos.BOOL][Codigos.RESTA] = Codigos.ERROR;
+		cubo[Codigos.BOOL][Codigos.BOOL][Codigos.DIV] = Codigos.ERROR;
+		cubo[Codigos.BOOL][Codigos.BOOL][Codigos.MULT] = Codigos.ERROR;
+		cubo[Codigos.BOOL][Codigos.BOOL][Codigos.ASIGN] = Codigos.BOOL;
+		cubo[Codigos.BOOL][Codigos.BOOL][Codigos.OPLOGIC] = Codigos.BOOL;
+		cubo[Codigos.BOOL][Codigos.BOOL][Codigos.OPREL] = Codigos.ERROR;
 	}
 	
 }
