@@ -579,18 +579,18 @@ public class ACBasic implements ACBasicConstants {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case AND:
         jj_consume_token(AND);
-              pilaOperadores.push(Codigos.AND);
+             pilaOperadores.push(Codigos.AND);
         break;
       case OR:
         jj_consume_token(OR);
-            pilaOperadores.push(Codigos.OR);
+           pilaOperadores.push(Codigos.OR);
         break;
       default:
         jj_la1[21] = jj_gen;
         jj_consume_token(-1);
         throw new ParseException();
       }
-      exp();
+      e1();
     }
   }
 
@@ -606,11 +606,11 @@ public class ACBasic implements ACBasicConstants {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case MENOR:
         jj_consume_token(MENOR);
-              pilaOperadores.push(Codigos.MENOR);
+                    pilaOperadores.push(Codigos.MENOR);
         break;
       case MAYOR:
         jj_consume_token(MAYOR);
-               pilaOperadores.push(Codigos.MAYOR);
+                                                                      pilaOperadores.push(Codigos.MAYOR);
         break;
       case MENORIG:
         jj_consume_token(MENORIG);
@@ -618,7 +618,7 @@ public class ACBasic implements ACBasicConstants {
         break;
       case MAYORIG:
         jj_consume_token(MAYORIG);
-                 pilaOperadores.push(Codigos.MAYORIG);
+                                                                       pilaOperadores.push(Codigos.MAYORIG);
         break;
       case IGUALIG:
         jj_consume_token(IGUALIG);
@@ -626,7 +626,7 @@ public class ACBasic implements ACBasicConstants {
         break;
       case DIFERENTE:
         jj_consume_token(DIFERENTE);
-                   pilaOperadores.push(Codigos.DIFERENTE);
+                                                                       pilaOperadores.push(Codigos.DIFERENTE);
         break;
       default:
         jj_la1[22] = jj_gen;
@@ -640,7 +640,7 @@ public class ACBasic implements ACBasicConstants {
     {
             if (pilaOperadores.peek()== Codigos.MENOR || pilaOperadores.peek()== Codigos.MAYOR
             || pilaOperadores.peek()== Codigos.MENORIG || pilaOperadores.peek()== Codigos.MAYORIG
-            || pilaOperadores.peek()== Codigos.IGUAL || pilaOperadores.peek()== Codigos.DIFERENTE){
+            || pilaOperadores.peek()== Codigos.IGUAL || pilaOperadores.peek()== Codigos.DIFERENTE) {
                         int operador = pilaOperadores.pop();
                         int operando2 = pilaOperandos.pop();
                         int operando1 = pilaOperandos.pop();
@@ -726,7 +726,7 @@ public class ACBasic implements ACBasicConstants {
         jj_consume_token(-1);
         throw new ParseException();
       }
-      e2();
+      term();
     }
   }
 
@@ -786,7 +786,7 @@ public class ACBasic implements ACBasicConstants {
         jj_consume_token(-1);
         throw new ParseException();
       }
-      term();
+      fact();
     }
   }
 
@@ -827,12 +827,8 @@ public class ACBasic implements ACBasicConstants {
 
   static final public void fact2() throws ParseException {
     jj_consume_token(PARIZQ);
-    // meter a pila fondo falso
-        pilaOperadores.push(Codigos.FONDOFALSO);
     exp();
     jj_consume_token(PARDER);
-    // sacar fondo falso
-    pilaOperadores.pop();
   }
 
   static final public void fact3() throws ParseException {
@@ -872,8 +868,12 @@ public class ACBasic implements ACBasicConstants {
 
   static final public void fact4() throws ParseException {
     jj_consume_token(CORIZQ);
+    // meter a pila fondo falso
+        pilaOperadores.push(Codigos.FONDOFALSO);
     exp();
     jj_consume_token(CORDER);
+    // sacar fondo falso
+    pilaOperadores.pop();
   }
 
   static final public void fact5() throws ParseException {

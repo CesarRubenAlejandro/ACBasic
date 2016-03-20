@@ -402,27 +402,23 @@ void exp():
 		}
     }   
   }
-  ( (< AND > {pilaOperadores.push(Codigos.AND);}
-  | < OR > {pilaOperadores.push(Codigos.OR);} ) exp())*
+  ((< AND > {pilaOperadores.push(Codigos.AND);}
+  | < OR >{pilaOperadores.push(Codigos.OR);}) e1())*
 }
 
 void e1():
 {}
 {
-  e2() [
-  (< MENOR > {pilaOperadores.push(Codigos.MENOR);}
-  | < MAYOR > {pilaOperadores.push(Codigos.MAYOR);}
-  | < MENORIG > {pilaOperadores.push(Codigos.MENORIG);}
-  | < MAYORIG > {pilaOperadores.push(Codigos.MAYORIG);}
-  | < IGUALIG > {pilaOperadores.push(Codigos.IGUAL);}
-  | < DIFERENTE > {pilaOperadores.push(Codigos.DIFERENTE);})
+  e2() [(< MENOR > {pilaOperadores.push(Codigos.MENOR);} | < MAYOR > {pilaOperadores.push(Codigos.MAYOR);}
+  | < MENORIG > {pilaOperadores.push(Codigos.MENORIG);} | < MAYORIG > {pilaOperadores.push(Codigos.MAYORIG);}
+  | < IGUALIG > {pilaOperadores.push(Codigos.IGUAL);} | < DIFERENTE > {pilaOperadores.push(Codigos.DIFERENTE);})
    e2() {
     // revisar si el tope es operador relacional
     
     if (!pilaOperadores.empty())    {
 	    if (pilaOperadores.peek()== Codigos.MENOR || pilaOperadores.peek()== Codigos.MAYOR
 	    || pilaOperadores.peek()== Codigos.MENORIG || pilaOperadores.peek()== Codigos.MAYORIG
-	    || pilaOperadores.peek()== Codigos.IGUAL || pilaOperadores.peek()== Codigos.DIFERENTE){
+	    || pilaOperadores.peek()== Codigos.IGUAL || pilaOperadores.peek()== Codigos.DIFERENTE) {
 			int operador = pilaOperadores.pop();
 			int operando2 = pilaOperandos.pop();
 			int operando1 = pilaOperandos.pop();
@@ -484,7 +480,7 @@ void e2():
   	}
   }
   ((< MAS > {pilaOperadores.push(Codigos.SUMA);}
-  | < MENOS > {pilaOperadores.push(Codigos.RESTA);}) e2())*
+  | < MENOS > {pilaOperadores.push(Codigos.RESTA);}) term())*
 }
 
 void term():
@@ -518,7 +514,7 @@ void term():
 	    }
 	}   }
   ((< POR > {pilaOperadores.push(Codigos.MULT);}
-  | < ENTRE >{pilaOperadores.push(Codigos.DIV);}) term())*
+  | < ENTRE >{pilaOperadores.push(Codigos.DIV);}) fact())*
 }
 
 void fact():
@@ -536,13 +532,7 @@ void fact1():
 void fact2():
 {}
 {
-  < PARIZQ > {
-    // meter a pila fondo falso
-	pilaOperadores.push(Codigos.FONDOFALSO);   
-  } exp() < PARDER > {
-    // sacar fondo falso
-    pilaOperadores.pop();
-  }
+  < PARIZQ > exp() < PARDER >
 }
 
 void fact3():
@@ -563,13 +553,19 @@ void fact3():
 void fact4():
 {}
 {
-  < CORIZQ > exp() < CORDER >
+  < CORIZQ >
+  {
+    // meter a pila fondo falso
+	pilaOperadores.push(Codigos.FONDOFALSO);     }
+  exp() < CORDER >  {
+    // sacar fondo falso
+    pilaOperadores.pop();  }
 }
 
 void fact5():
 {}
 {
-  < PARIZQ >  exp() (< COMA > exp())* < PARDER > 
+  < PARIZQ > exp() (< COMA > exp())* < PARDER >
 }
 
 void cond():
