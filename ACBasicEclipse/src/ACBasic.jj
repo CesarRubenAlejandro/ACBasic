@@ -36,7 +36,8 @@ public class ACBasic
      parser.prog();
      System.out.println("OK.");
      System.out.println("CUADRUPLOS:");
-     for (int i=0; i<20; i++) {		 System.out.println(i + ": " + matrizCuadruplos[i][0] + " " + matrizCuadruplos[i][1] + " "
+     for (int i=0; i<20; i++) {
+		 System.out.println(i + ": " + matrizCuadruplos[i][0] + " " + matrizCuadruplos[i][1] + " "
 		 + matrizCuadruplos[i][2] + " " + matrizCuadruplos[i][3]);
      }
           
@@ -75,7 +76,9 @@ public class ACBasic
       	System.out.println("Error: Tipos no coinciden:" + detail);
 		System.exit(0);
       	break;
-          }  }
+      
+    }
+  }
   
 }
 
@@ -152,8 +155,10 @@ TOKEN :
 void prog() :
 {Token idPrograma;}
 {
-  < PROGRAM >  {
-    dirProcedimientos = new DirectorioProcedimientos();  }
+  < PROGRAM >
+  {
+    dirProcedimientos = new DirectorioProcedimientos();
+  }
    idPrograma =  <ID >
    {
      	// guardar el nombre del programa en el directorio de procedimientos
@@ -167,7 +172,8 @@ void prog() :
 		// guardar el procedimiento program en el directorio de procedimientos
 		if (!dirProcedimientos.agregarProcedimiento(programProc)) {
 		  // si ya existe un procedimiento con ese nombre, reportar error
-		  errorHandler(1,idPrograma.toString());		}
+		  errorHandler(1,idPrograma.toString());
+		}
    }
    <PYC > [vars()] (func())* main()
 }
@@ -197,9 +203,11 @@ void defarr():
 void vars():
 {}
 {
-  < VAR >  {
+  < VAR >
+  {
     // crear tabla de variables para el procedimiento actual
-    dirProcedimientos.getProcedimientos().get(procedimientoActual).crearTablaDeVariables();  }
+    dirProcedimientos.getProcedimientos().get(procedimientoActual).crearTablaDeVariables();
+  }
    vars1() < PYC > (vars1() < PYC >)*
 }
 
@@ -217,14 +225,17 @@ void vars2():
     // asignar el tipo de scope de la variable
     
     String scopeVar = "local";
-    if (procedimientoActual.equals("program")) {	  // unicamente si el procedimiento actual es de tipo program, el scope es global
+    if (procedimientoActual.equals("program")) {
+	  // unicamente si el procedimiento actual es de tipo program, el scope es global
       scopeVar = "global";
    	}
    	// crear objeto variable y darlo de alta en directorio de variables del procedimiento actual
     Variable varAuxiliar = new Variable(nombreVariable.toString(), tipoVariable, scopeVar);
     if(!dirProcedimientos.getProcedimientos().get(procedimientoActual).agregarVariable(varAuxiliar)){
 	  // si ya existe una variable en este directorio con el mismo nombre, reportar error
-      errorHandler(2,nombreVariable.toString());    }  }[<IGUAL > cte()]
+      errorHandler(2,nombreVariable.toString());
+    }
+  }[<IGUAL > cte()]
   (< COMA > nombreVariable=<ID >
 	{
    	// crear objeto variable y darlo de alta en directorio de variables del procedimiento actual
@@ -245,9 +256,11 @@ void vars3():
     // crear objeto variable
     Variable auxArreglo = new Variable();
   }
-  tipoArreglo = tipo()  {
+  tipoArreglo = tipo()
+  {
     // guardar el tipo de variable
-    auxArreglo.setTipoVariable(tipoArreglo);  }
+    auxArreglo.setTipoVariable(tipoArreglo);
+  }
   nombreArreglo = < ID >
   {
     // guardar el nombre de la variable
@@ -257,13 +270,17 @@ void vars3():
     String scope = "local";
     if(procedimientoActual.equals("program")){
       // unicamente si el procedimiento actual es program, el scope de la variable es global
-      scope = "global";    }
+      scope = "global";
+    }
     auxArreglo.setScope(scope);
 
 	// dar de alta la variable en el directorio de variables del procedimiento actual
     if(!dirProcedimientos.getProcedimientos().get(procedimientoActual).agregarVariable(auxArreglo)){
 	  // si ya existe una variable con ese nombre, reportar error
-      errorHandler(2,nombreArreglo.toString());    }  }  
+      errorHandler(2,nombreArreglo.toString());
+    }
+  }
+  
    <CORIZQ > <CTEI > <CORDER > [<IGUAL > defarr()]
 }
 
@@ -271,13 +288,18 @@ void vars3():
 void func():
 {int tipoFuncion; Token nombreProc;}
 {
- < FUNC > {
+ < FUNC >
+ {
    // crear un objeto procedimiento
-   Procedimiento procAux = new Procedimiento(); }
- tipoFuncion = func1() {
+   Procedimiento procAux = new Procedimiento();
+ }
+ tipoFuncion = func1()
+ {
    // guardar el tipo de procedimiento
-   procAux.setTipoProcedimiento(tipoFuncion); }
- nombreProc = < ID > {
+   procAux.setTipoProcedimiento(tipoFuncion);
+ }
+ nombreProc = < ID >
+ {
    // guardar el nombre del procedimiento en el objeto
    procAux.setNombreProcedimiento(nombreProc.toString());
 
@@ -287,11 +309,14 @@ void func():
 		  errorHandler(1, nombreProc.toString());
 	} else{
 	  // si se pudo guardar el procedimiento, asignar procedimientoActual con el id recien leido
-   		procedimientoActual = nombreProc.toString();	}
+   		procedimientoActual = nombreProc.toString();
+	}
  }
- <PARIZQ > param() < PARDER > body() {
+ <PARIZQ > param() < PARDER > body()
+ {
    // borrar tabla de variables para el procedimiento actual
-   dirProcedimientos.getProcedimientos().get(procedimientoActual).setVariables(null); }
+   dirProcedimientos.getProcedimientos().get(procedimientoActual).setVariables(null);
+ }
  
 }
 
@@ -311,21 +336,27 @@ void param():
 void param1():
 {int tipoParam; Token nombreParam;}
 {
-  tipoParam = tipo()  {
+  tipoParam = tipo()
+  {
     // si el procedimiento actual no tiene ya un directorio de variables, crearlo
-    if(dirProcedimientos.getProcedimientos().get(procedimientoActual).getVariables()==null){     dirProcedimientos.getProcedimientos().get(procedimientoActual).crearTablaDeVariables();
+    if(dirProcedimientos.getProcedimientos().get(procedimientoActual).getVariables()==null){
+     dirProcedimientos.getProcedimientos().get(procedimientoActual).crearTablaDeVariables();
 	}
 	// crear objeto variable y guardar el tipo y scope
     Variable paramAux = new Variable();
     paramAux.setTipoVariable(tipoParam);
-    paramAux.setScope("local");  }
-   [< AMP >] nombreParam = <ID >   {
+    paramAux.setScope("local");
+  }
+   [< AMP >] nombreParam = <ID >
+   {
      // guardar el nombre del parametro en el objeto
      paramAux.setNombreVariable(nombreParam.toString());
 	// dar de alta el parametro en el directorio de variables del procedimiento actual
-     if(!dirProcedimientos.getProcedimientos().get(procedimientoActual).agregarVariable(paramAux)){		// reportar error si ya existe una variable con ese nombre
+     if(!dirProcedimientos.getProcedimientos().get(procedimientoActual).agregarVariable(paramAux)){
+		// reportar error si ya existe una variable con ese nombre
 		errorHandler(3, nombreParam.toString());
-     }   } 
+     }
+   } 
 }
 
 void body():
@@ -343,9 +374,11 @@ void body1():
 void assign():
 {}
 {
-  [<CORIZQ > exp() < CORDER >] <IGUAL >  {
+  [<CORIZQ > exp() < CORDER >] <IGUAL >
+  {
     // meter operador de asignacion a operadores
-    pilaOperadores.push(Codigos.ASSIGN);  } exp()
+    pilaOperadores.push(Codigos.ASSIGN);
+  } exp()
   {
     	int operador = pilaOperadores.pop();
 		int operando2 = pilaOperandos.pop();
@@ -365,7 +398,8 @@ void assign():
 		} else {
 		  // ERROR
 		  errorHandler(5, tipo1 + " y " +tipo2);
-		}	  }
+		}	
+  }
    < PYC > 
 }
 
@@ -402,53 +436,28 @@ void exp():
 		}
     }   
   }
-  ((< AND > {pilaOperadores.push(Codigos.AND);}
-  | < OR >{pilaOperadores.push(Codigos.OR);}) e1()
-  {
-    // revisar si el tope es AND u OR
-    if (!pilaOperadores.empty()) {
-	    if (pilaOperadores.peek()== Codigos.AND || pilaOperadores.peek()== Codigos.OR) {
-			int operador = pilaOperadores.pop();
-			int operando2 = pilaOperandos.pop();
-			int operando1 = pilaOperandos.pop();
-			int tipo2 = pilaTipos.pop();
-			int tipo1 = pilaTipos.pop();
-			int tipoRes = cuboSemantico.getCubo()[tipo1][tipo2][Codigos.OPLOGIC];
-			// revisar si combinacion de tipos es permitida
-			if(tipoRes != Codigos.ERROR) {
-				// generar cuadruplo
-			  	matrizCuadruplos[contadorCuadruplo][0] = operador;
-			  	matrizCuadruplos[contadorCuadruplo][1] = operando1;
-			  	matrizCuadruplos[contadorCuadruplo][2] = operando2;
-			  	int direccionRes = ManejadorMemoria.getMemoriaTemporal(tipoRes);
-			  	matrizCuadruplos[contadorCuadruplo][3] = direccionRes;
-			  	contadorCuadruplo++;
-			  	//guardar resultado en pila operandos
-			  	pilaOperandos.push(direccionRes);
-			  	pilaTipos.push(tipoRes);
-			} else {
-			  // ERROR
-			  errorHandler(5, tipo1 + " y " +tipo2);
-			}
-		}
-    }   
-  }
-  )*
+  ( (< AND > {pilaOperadores.push(Codigos.AND);}
+  | < OR > {pilaOperadores.push(Codigos.OR);} ) exp())*
 }
 
 void e1():
 {}
 {
-  e2() [(< MENOR > {pilaOperadores.push(Codigos.MENOR);} | < MAYOR > {pilaOperadores.push(Codigos.MAYOR);}
-  | < MENORIG > {pilaOperadores.push(Codigos.MENORIG);} | < MAYORIG > {pilaOperadores.push(Codigos.MAYORIG);}
-  | < IGUALIG > {pilaOperadores.push(Codigos.IGUAL);} | < DIFERENTE > {pilaOperadores.push(Codigos.DIFERENTE);})
+  e2() [
+  (< MENOR > {pilaOperadores.push(Codigos.MENOR);}
+  | < MAYOR > {pilaOperadores.push(Codigos.MAYOR);}
+  | < MENORIG > {pilaOperadores.push(Codigos.MENORIG);}
+  | < MAYORIG > {pilaOperadores.push(Codigos.MAYORIG);}
+  | < IGUALIG > {pilaOperadores.push(Codigos.IGUAL);}
+  | < DIFERENTE > {pilaOperadores.push(Codigos.DIFERENTE);})
    e2() {
     // revisar si el tope es operador relacional
     
-    if (!pilaOperadores.empty())    {
+    if (!pilaOperadores.empty())
+    {
 	    if (pilaOperadores.peek()== Codigos.MENOR || pilaOperadores.peek()== Codigos.MAYOR
 	    || pilaOperadores.peek()== Codigos.MENORIG || pilaOperadores.peek()== Codigos.MAYORIG
-	    || pilaOperadores.peek()== Codigos.IGUAL || pilaOperadores.peek()== Codigos.DIFERENTE) {
+	    || pilaOperadores.peek()== Codigos.IGUAL || pilaOperadores.peek()== Codigos.DIFERENTE){
 			int operador = pilaOperadores.pop();
 			int operando2 = pilaOperandos.pop();
 			int operando1 = pilaOperandos.pop();
@@ -510,75 +519,18 @@ void e2():
   	}
   }
   ((< MAS > {pilaOperadores.push(Codigos.SUMA);}
-  | < MENOS > {pilaOperadores.push(Codigos.RESTA);}) term()
-  {
-    // revisar si el tope es + o -   
-    if (!pilaOperadores.empty()) { 
-	    if (pilaOperadores.peek()== Codigos.SUMA || pilaOperadores.peek()== Codigos.RESTA) {
-			int operador = pilaOperadores.pop();
-			int operando2 = pilaOperandos.pop();
-			int operando1 = pilaOperandos.pop();
-			int tipo2 = pilaTipos.pop();
-			int tipo1 = pilaTipos.pop();
-			int tipoRes = cuboSemantico.getCubo()[tipo1][tipo2][operador];
-			// revisar si combinacion de tipos es permitida
-			if(tipoRes != Codigos.ERROR) {
-				// generar cuadruplo
-			  	matrizCuadruplos[contadorCuadruplo][0] = operador;
-			  	matrizCuadruplos[contadorCuadruplo][1] = operando1;
-			  	matrizCuadruplos[contadorCuadruplo][2] = operando2;
-			  	int direccionRes = ManejadorMemoria.getMemoriaTemporal(tipoRes);
-			  	matrizCuadruplos[contadorCuadruplo][3] = direccionRes;
-			  	contadorCuadruplo++;
-			  	//guardar resultado en pila operandos
-			  	pilaOperandos.push(direccionRes);
-			  	pilaTipos.push(tipoRes);
-			} else {
-			  // ERROR
-			  errorHandler(5, tipo1 + " y " +tipo2);
-			}	
-    	}   
-  	}
-  }
-  )*
+  | < MENOS > {pilaOperadores.push(Codigos.RESTA);}) e2())*
 }
 
 void term():
 {}
 {
-  fact()  {
-    // revisar si el tope es * o /
-    
-    if (!pilaOperadores.empty()) {
-	    if (pilaOperadores.peek()== Codigos.MULT || pilaOperadores.peek()== Codigos.DIV) {
-			int operador = pilaOperadores.pop();
-			int operando2 = pilaOperandos.pop();
-			int operando1 = pilaOperandos.pop();
-			int tipo2 = pilaTipos.pop();
-			int tipo1 = pilaTipos.pop();
-			int tipoRes = cuboSemantico.getCubo()[tipo1][tipo2][operador];
-			// revisar si combinacion de tipos es permitida
-			if(tipoRes != Codigos.ERROR) {
-				// generar cuadruplo
-			  	matrizCuadruplos[contadorCuadruplo][0] = operador;
-			  	matrizCuadruplos[contadorCuadruplo][1] = operando1;
-			  	matrizCuadruplos[contadorCuadruplo][2] = operando2;
-			  	int direccionRes = ManejadorMemoria.getMemoriaTemporal(tipoRes);
-			  	matrizCuadruplos[contadorCuadruplo][3] = direccionRes;
-			  	contadorCuadruplo++;
-			  	//guardar resultado en pila operandos
-			  	pilaOperandos.push(direccionRes);
-			  	pilaTipos.push(tipoRes);			} else {
-			  // ERROR
-			  errorHandler(5, tipo1 + " y " +tipo2);			}	
-	    }
-	}   }
-  ((< POR > {pilaOperadores.push(Codigos.MULT);}
-  | < ENTRE >{pilaOperadores.push(Codigos.DIV);}) fact()
+  fact()
   {
     // revisar si el tope es * o /
     
     if (!pilaOperadores.empty()) {
+       
 	    if (pilaOperadores.peek()== Codigos.MULT || pilaOperadores.peek()== Codigos.DIV) {
 			int operador = pilaOperadores.pop();
 			int operando2 = pilaOperandos.pop();
@@ -605,7 +557,8 @@ void term():
 	    }
 	} 
   }
-  )*
+  ((< POR > {pilaOperadores.push(Codigos.MULT);}
+  | < ENTRE >{pilaOperadores.push(Codigos.DIV);}) term())*
 }
 
 void fact():
@@ -623,40 +576,44 @@ void fact1():
 void fact2():
 {}
 {
-  < PARIZQ > exp() < PARDER >
+  < PARIZQ > {
+    // meter a pila fondo falso
+	pilaOperadores.push(Codigos.FONDOFALSO);   
+  } exp() < PARDER > {
+    // sacar fondo falso
+    pilaOperadores.pop();
+  }
 }
 
 void fact3():
 {Token id;}
 {
- id = < ID > {
+ id = < ID >
+ {
    // buscar que exista el id
    Variable varActual = dirProcedimientos.obtenerVariable(procedimientoActual, id.toString()); 
    if ( varActual == null) {
      // ERROR
-     errorHandler(4, id.toString());   } else {
+     errorHandler(4, id.toString());
+   } else {
      // meter direccion y tipo a las pilas
      pilaOperandos.push(varActual.getDireccionVariable());
-     pilaTipos.push(varActual.getTipoVariable());   }
-    } [(fact4() | fact5())] 
+     pilaTipos.push(varActual.getTipoVariable());
+   }
+   
+ } [(fact4() | fact5())] 
 }
 
 void fact4():
 {}
 {
-  < CORIZQ >
-  {
-    // meter a pila fondo falso
-	pilaOperadores.push(Codigos.FONDOFALSO);     }
-  exp() < CORDER >  {
-    // sacar fondo falso
-    pilaOperadores.pop();  }
+  < CORIZQ > exp() < CORDER >
 }
 
 void fact5():
 {}
 {
-  < PARIZQ > exp() (< COMA > exp())* < PARDER >
+  < PARIZQ >  exp() (< COMA > exp())* < PARDER > 
 }
 
 void cond():
@@ -668,21 +625,24 @@ void cond():
 void write():
 {}
 {
-  < PRINT > <PARIZQ > exp()  {
+  < PRINT > <PARIZQ > exp()
+  {
     int resultado = pilaOperandos.pop();
     // generar cuadruplo de print
     matrizCuadruplos[contadorCuadruplo][0] = Codigos.PRINT;
   	matrizCuadruplos[contadorCuadruplo][1] = Codigos.NULO;
   	matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
   	matrizCuadruplos[contadorCuadruplo][3] = resultado;
-  	contadorCuadruplo++;  }
+  	contadorCuadruplo++;
+  }
    < PARDER > <PYC >
 }
 
 void read():
 {Token id;}
 {
-  < READ > <PARIZQ > id=<ID > [<CORIZQ > exp() < CORDER >] < PARDER >  {
+  < READ > <PARIZQ > id=<ID > [<CORIZQ > exp() < CORDER >] < PARDER >
+  {
     // buscar que exista el id
    Variable varActual = dirProcedimientos.obtenerVariable(procedimientoActual, id.toString()); 
    if ( varActual == null) {
@@ -695,7 +655,8 @@ void read():
       matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
       matrizCuadruplos[contadorCuadruplo][3] = varActual.getDireccionVariable();
       contadorCuadruplo++;
-   }   } <PYC >
+   } 
+  } <PYC >
 }
 
 void cycle():
@@ -713,7 +674,8 @@ void llam():
 void main():
 {}
 {
-  < MAIN >  {
+  < MAIN >
+  {
 	// asignar procedimientoActual a main
 	procedimientoActual ="main";
     // crear el procedimiento Main con nombre y tipo
@@ -722,7 +684,8 @@ void main():
 	mainProc.setTipoProcedimiento(Codigos.MAIN);
 
     // dar de alta el proc main en directorio de procedimientos
-    dirProcedimientos.agregarProcedimiento(mainProc);  } <PARIZQ > < PARDER > body()
+    dirProcedimientos.agregarProcedimiento(mainProc);
+  } <PARIZQ > < PARDER > body()
 }
 
 void assignllam():
