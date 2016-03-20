@@ -674,8 +674,7 @@ public class ACBasic implements ACBasicConstants {
 
   static final public void e2() throws ParseException {
     term();
-    // revisar si el tope es + o -
-
+    // revisar si el tope es + o -   
     if (!pilaOperadores.empty()) {
             if (pilaOperadores.peek()== Codigos.SUMA || pilaOperadores.peek()== Codigos.RESTA) {
                         int operador = pilaOperadores.pop();
