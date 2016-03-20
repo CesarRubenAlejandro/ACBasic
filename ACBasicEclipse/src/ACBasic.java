@@ -25,23 +25,16 @@ public class ACBasic implements ACBasicConstants {
     {
      parser.prog();
      System.out.println("OK.");
-     for (String keyActual: dirProcedimientos.getProcedimientos().keySet()){
-          System.out.println("---------------------------");
-          Procedimiento actual = dirProcedimientos.getProcedimientos().get(keyActual);
-          System.out.print(actual.getNombreProcedimiento()+ ": ");
-          System.out.println(actual.getTipoProcedimiento());
-          for (String keyVariable : actual.getVariables().keySet()) {
-                        Variable varActual = actual.getVariables().get(keyVariable);
-                        System.out.print(varActual.getNombreVariable() + ": ");
-                        System.out.print(varActual.getTipoVariable() + ": ");
-                        System.out.println(varActual.getDireccionVariable());
-          }
-      }
+     System.out.println("CUADRUPLOS:");
+     for (int i=0; i<20; i++) {
+                 System.out.println(i + ": " + matrizCuadruplos[i][0] + " " + matrizCuadruplos[i][1] + " "
+                 + matrizCuadruplos[i][2] + " " + matrizCuadruplos[i][3]);
+     }
 
       } catch (Exception e)
       {
         System.out.println("NOK.");
-        System.out.println(e.getMessage());
+       e.printStackTrace();
       }
       catch (Error e)
       {
@@ -65,6 +58,14 @@ public class ACBasic implements ACBasicConstants {
         System.out.println("Error: Parametro repetido:" + detail);
                 System.exit(0);
         break;
+      case 4:
+        System.out.println("Error: Variable no definida:" + detail);
+                System.exit(0);
+        break;
+      case 5:
+        System.out.println("Error: Tipos no coinciden:" + detail);
+                System.exit(0);
+        break;
 
     }
   }
@@ -74,6 +75,8 @@ public class ACBasic implements ACBasicConstants {
     jj_consume_token(PROGRAM);
     dirProcedimientos = new DirectorioProcedimientos();
     idPrograma = jj_consume_token(ID);
+        // guardar el nombre del programa en el directorio de procedimientos
+        dirProcedimientos.setNombrePrograma(idPrograma.toString());
         // guardar el id del procedimiento actual
                 procedimientoActual = idPrograma.toString();
                 // crear un objeto procedimiento auxiliar para guardar info del procedimiento program
@@ -508,15 +511,10 @@ public class ACBasic implements ACBasicConstants {
       ;
     }
     jj_consume_token(IGUAL);
+    // meter operador de asignacion a operadores
+    pilaOperadores.push(Codigos.ASSIGN);
     exp();
-    jj_consume_token(PYC);
-  }
-
-  static final public void exp() throws ParseException {
-    e1();
-    // revisar si el tope es AND u OR
-    if (pilaOperadores.peek()== Codigos.AND || pilaOperadores.peek()== Codigos.OR) {
-                int operador = pilaOperadores.pop();
+        int operador = pilaOperadores.pop();
                 int operando2 = pilaOperandos.pop();
                 int operando1 = pilaOperandos.pop();
                 int tipo2 = pilaTipos.pop();
@@ -526,15 +524,45 @@ public class ACBasic implements ACBasicConstants {
                 if(tipoRes != Codigos.ERROR) {
                         // generar cuadruplo
                         matrizCuadruplos[contadorCuadruplo][0] = operador;
-                        matrizCuadruplos[contadorCuadruplo][1] = operando1;
-                        matrizCuadruplos[contadorCuadruplo][2] = operando2;
-                        int direccionRes = ManejadorMemoria.getMemoriaTemporal(tipoRes);
-                        matrizCuadruplos[contadorCuadruplo][3] = direccionRes;
-                        //guardar resultado en pila operandos
-                        pilaOperandos.push(direccionRes);
-                        pilaTipos.push(tipoRes);
+                        matrizCuadruplos[contadorCuadruplo][1] = operando2;
+                        matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
+                        matrizCuadruplos[contadorCuadruplo][3] = operando1;
+                        contadorCuadruplo++;
+
                 } else {
                   // ERROR
+                  errorHandler(5, tipo1 + " y " +tipo2);
+                }
+    jj_consume_token(PYC);
+  }
+
+  static final public void exp() throws ParseException {
+    e1();
+    // revisar si el tope es AND u OR
+    if (!pilaOperadores.empty()) {
+            if (pilaOperadores.peek()== Codigos.AND || pilaOperadores.peek()== Codigos.OR) {
+                        int operador = pilaOperadores.pop();
+                        int operando2 = pilaOperandos.pop();
+                        int operando1 = pilaOperandos.pop();
+                        int tipo2 = pilaTipos.pop();
+                        int tipo1 = pilaTipos.pop();
+                        int tipoRes = cuboSemantico.getCubo()[tipo1][tipo2][Codigos.OPLOGIC];
+                        // revisar si combinacion de tipos es permitida
+                        if(tipoRes != Codigos.ERROR) {
+                                // generar cuadruplo
+                                matrizCuadruplos[contadorCuadruplo][0] = operador;
+                                matrizCuadruplos[contadorCuadruplo][1] = operando1;
+                                matrizCuadruplos[contadorCuadruplo][2] = operando2;
+                                int direccionRes = ManejadorMemoria.getMemoriaTemporal(tipoRes);
+                                matrizCuadruplos[contadorCuadruplo][3] = direccionRes;
+                                contadorCuadruplo++;
+                                //guardar resultado en pila operandos
+                                pilaOperandos.push(direccionRes);
+                                pilaTipos.push(tipoRes);
+                        } else {
+                          // ERROR
+                          errorHandler(5, tipo1 + " y " +tipo2);
+                        }
                 }
     }
     label_7:
@@ -578,21 +606,27 @@ public class ACBasic implements ACBasicConstants {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case MENOR:
         jj_consume_token(MENOR);
+                    pilaOperadores.push(Codigos.MENOR);
         break;
       case MAYOR:
         jj_consume_token(MAYOR);
+                                                                      pilaOperadores.push(Codigos.MAYOR);
         break;
       case MENORIG:
         jj_consume_token(MENORIG);
+                 pilaOperadores.push(Codigos.MENORIG);
         break;
       case MAYORIG:
         jj_consume_token(MAYORIG);
+                                                                       pilaOperadores.push(Codigos.MAYORIG);
         break;
       case IGUALIG:
         jj_consume_token(IGUALIG);
+                 pilaOperadores.push(Codigos.IGUAL);
         break;
       case DIFERENTE:
         jj_consume_token(DIFERENTE);
+                                                                       pilaOperadores.push(Codigos.DIFERENTE);
         break;
       default:
         jj_la1[22] = jj_gen;
@@ -600,6 +634,37 @@ public class ACBasic implements ACBasicConstants {
         throw new ParseException();
       }
       e2();
+    // revisar si el tope es operador relacional
+
+    if (!pilaOperadores.empty())
+    {
+            if (pilaOperadores.peek()== Codigos.MENOR || pilaOperadores.peek()== Codigos.MAYOR
+            || pilaOperadores.peek()== Codigos.MENORIG || pilaOperadores.peek()== Codigos.MAYORIG
+            || pilaOperadores.peek()== Codigos.IGUAL || pilaOperadores.peek()== Codigos.DIFERENTE) {
+                        int operador = pilaOperadores.pop();
+                        int operando2 = pilaOperandos.pop();
+                        int operando1 = pilaOperandos.pop();
+                        int tipo2 = pilaTipos.pop();
+                        int tipo1 = pilaTipos.pop();
+                        int tipoRes = cuboSemantico.getCubo()[tipo1][tipo2][Codigos.OPREL];
+                        // revisar si combinacion de tipos es permitida
+                        if(tipoRes != Codigos.ERROR) {
+                                // generar cuadruplo
+                                matrizCuadruplos[contadorCuadruplo][0] = operador;
+                                matrizCuadruplos[contadorCuadruplo][1] = operando1;
+                                matrizCuadruplos[contadorCuadruplo][2] = operando2;
+                                int direccionRes = ManejadorMemoria.getMemoriaTemporal(tipoRes);
+                                matrizCuadruplos[contadorCuadruplo][3] = direccionRes;
+                                contadorCuadruplo++;
+                                //guardar resultado en pila operandos
+                                pilaOperandos.push(direccionRes);
+                                pilaTipos.push(tipoRes);
+                        } else {
+                          // ERROR
+                          errorHandler(5, tipo1 + " y " +tipo2);
+                        }
+            }
+        }
       break;
     default:
       jj_la1[23] = jj_gen;
@@ -610,28 +675,33 @@ public class ACBasic implements ACBasicConstants {
   static final public void e2() throws ParseException {
     term();
     // revisar si el tope es + o -
-    if (pilaOperadores.peek()== Codigos.SUMA || pilaOperadores.peek()== Codigos.RESTA) {
-                int operador = pilaOperadores.pop();
-                int operando2 = pilaOperandos.pop();
-                int operando1 = pilaOperandos.pop();
-                int tipo2 = pilaTipos.pop();
-                int tipo1 = pilaTipos.pop();
-                int tipoRes = cuboSemantico.getCubo()[tipo1][tipo2][operador];
-                // revisar si combinacion de tipos es permitida
-                if(tipoRes != Codigos.ERROR) {
-                        // generar cuadruplo
-                        matrizCuadruplos[contadorCuadruplo][0] = operador;
-                        matrizCuadruplos[contadorCuadruplo][1] = operando1;
-                        matrizCuadruplos[contadorCuadruplo][2] = operando2;
-                        int direccionRes = ManejadorMemoria.getMemoriaTemporal(tipoRes);
-                        matrizCuadruplos[contadorCuadruplo][3] = direccionRes;
-                        //guardar resultado en pila operandos
-                        pilaOperandos.push(direccionRes);
-                        pilaTipos.push(tipoRes);
-                } else {
-                  // ERROR
-                }
-    }
+
+    if (!pilaOperadores.empty()) {
+            if (pilaOperadores.peek()== Codigos.SUMA || pilaOperadores.peek()== Codigos.RESTA) {
+                        int operador = pilaOperadores.pop();
+                        int operando2 = pilaOperandos.pop();
+                        int operando1 = pilaOperandos.pop();
+                        int tipo2 = pilaTipos.pop();
+                        int tipo1 = pilaTipos.pop();
+                        int tipoRes = cuboSemantico.getCubo()[tipo1][tipo2][operador];
+                        // revisar si combinacion de tipos es permitida
+                        if(tipoRes != Codigos.ERROR) {
+                                // generar cuadruplo
+                                matrizCuadruplos[contadorCuadruplo][0] = operador;
+                                matrizCuadruplos[contadorCuadruplo][1] = operando1;
+                                matrizCuadruplos[contadorCuadruplo][2] = operando2;
+                                int direccionRes = ManejadorMemoria.getMemoriaTemporal(tipoRes);
+                                matrizCuadruplos[contadorCuadruplo][3] = direccionRes;
+                                contadorCuadruplo++;
+                                //guardar resultado en pila operandos
+                                pilaOperandos.push(direccionRes);
+                                pilaTipos.push(tipoRes);
+                        } else {
+                          // ERROR
+                          errorHandler(5, tipo1 + " y " +tipo2);
+                        }
+        }
+        }
     label_8:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -664,28 +734,34 @@ public class ACBasic implements ACBasicConstants {
   static final public void term() throws ParseException {
     fact();
     // revisar si el tope es * o /
-    if (pilaOperadores.peek()== Codigos.MULT || pilaOperadores.peek()== Codigos.DIV) {
-                int operador = pilaOperadores.pop();
-                int operando2 = pilaOperandos.pop();
-                int operando1 = pilaOperandos.pop();
-                int tipo2 = pilaTipos.pop();
-                int tipo1 = pilaTipos.pop();
-                int tipoRes = cuboSemantico.getCubo()[tipo1][tipo2][operador];
-                // revisar si combinacion de tipos es permitida
-                if(tipoRes != Codigos.ERROR) {
-                        // generar cuadruplo
-                        matrizCuadruplos[contadorCuadruplo][0] = operador;
-                        matrizCuadruplos[contadorCuadruplo][1] = operando1;
-                        matrizCuadruplos[contadorCuadruplo][2] = operando2;
-                        int direccionRes = ManejadorMemoria.getMemoriaTemporal(tipoRes);
-                        matrizCuadruplos[contadorCuadruplo][3] = direccionRes;
-                        //guardar resultado en pila operandos
-                        pilaOperandos.push(direccionRes);
-                        pilaTipos.push(tipoRes);
-                } else {
-                  // ERROR
-                }
-    }
+
+    if (!pilaOperadores.empty()) {
+
+            if (pilaOperadores.peek()== Codigos.MULT || pilaOperadores.peek()== Codigos.DIV) {
+                        int operador = pilaOperadores.pop();
+                        int operando2 = pilaOperandos.pop();
+                        int operando1 = pilaOperandos.pop();
+                        int tipo2 = pilaTipos.pop();
+                        int tipo1 = pilaTipos.pop();
+                        int tipoRes = cuboSemantico.getCubo()[tipo1][tipo2][operador];
+                        // revisar si combinacion de tipos es permitida
+                        if(tipoRes != Codigos.ERROR) {
+                                // generar cuadruplo
+                                matrizCuadruplos[contadorCuadruplo][0] = operador;
+                                matrizCuadruplos[contadorCuadruplo][1] = operando1;
+                                matrizCuadruplos[contadorCuadruplo][2] = operando2;
+                                int direccionRes = ManejadorMemoria.getMemoriaTemporal(tipoRes);
+                                matrizCuadruplos[contadorCuadruplo][3] = direccionRes;
+                                contadorCuadruplo++;
+                                //guardar resultado en pila operandos
+                                pilaOperandos.push(direccionRes);
+                                pilaTipos.push(tipoRes);
+                        } else {
+                          // ERROR
+                          errorHandler(5, tipo1 + " y " +tipo2);
+                        }
+            }
+        }
     label_9:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -763,6 +839,7 @@ public class ACBasic implements ACBasicConstants {
    Variable varActual = dirProcedimientos.obtenerVariable(procedimientoActual, id.toString());
    if ( varActual == null) {
      // ERROR
+     errorHandler(4, id.toString());
    } else {
      // meter direccion y tipo a las pilas
      pilaOperandos.push(varActual.getDireccionVariable());
@@ -856,14 +933,22 @@ public class ACBasic implements ACBasicConstants {
     jj_consume_token(PRINT);
     jj_consume_token(PARIZQ);
     exp();
+    int resultado = pilaOperandos.pop();
+    // generar cuadruplo de print
+    matrizCuadruplos[contadorCuadruplo][0] = Codigos.PRINT;
+        matrizCuadruplos[contadorCuadruplo][1] = Codigos.NULO;
+        matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
+        matrizCuadruplos[contadorCuadruplo][3] = resultado;
+        contadorCuadruplo++;
     jj_consume_token(PARDER);
     jj_consume_token(PYC);
   }
 
   static final public void read() throws ParseException {
+ Token id;
     jj_consume_token(READ);
     jj_consume_token(PARIZQ);
-    jj_consume_token(ID);
+    id = jj_consume_token(ID);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case CORIZQ:
       jj_consume_token(CORIZQ);
@@ -875,6 +960,19 @@ public class ACBasic implements ACBasicConstants {
       ;
     }
     jj_consume_token(PARDER);
+    // buscar que exista el id
+   Variable varActual = dirProcedimientos.obtenerVariable(procedimientoActual, id.toString());
+   if ( varActual == null) {
+     // ERROR
+     errorHandler(4, id.toString());
+   } else {
+      // generar cuadruplo de print 
+      matrizCuadruplos[contadorCuadruplo][0] = Codigos.READ;
+      matrizCuadruplos[contadorCuadruplo][1] = Codigos.NULO;
+      matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
+      matrizCuadruplos[contadorCuadruplo][3] = varActual.getDireccionVariable();
+      contadorCuadruplo++;
+   }
     jj_consume_token(PYC);
   }
 
@@ -923,13 +1021,24 @@ public class ACBasic implements ACBasicConstants {
   }
 
   static final public void assignllam() throws ParseException {
-    jj_consume_token(ID);
+ Token id;
+    id = jj_consume_token(ID);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case PARIZQ:
       llam();
       break;
     case CORIZQ:
     case IGUAL:
+   // buscar que exista el id
+   Variable varActual = dirProcedimientos.obtenerVariable(procedimientoActual, id.toString());
+   if ( varActual == null) {
+     // ERROR
+     errorHandler(4, id.toString());
+   } else {
+     // meter direccion y tipo a las pilas
+     pilaOperandos.push(varActual.getDireccionVariable());
+     pilaTipos.push(varActual.getTipoVariable());
+   }
       assign();
       break;
     default:

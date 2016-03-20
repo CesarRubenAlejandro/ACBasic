@@ -11,11 +11,24 @@ public class DirectorioProcedimientos {
 	// mapa que guarda todos los procedimientos. 
 	// la llave String es el id del procedimiento
 	private HashMap<String, Procedimiento> procedimientos;
+	private String nombrePrograma;
 
 	public DirectorioProcedimientos() {
 		super();
 		procedimientos = new HashMap<String, Procedimiento> ();
 	}
+
+	public String getNombrePrograma() {
+		return nombrePrograma;
+	}
+
+
+
+	public void setNombrePrograma(String nombrePrograma) {
+		this.nombrePrograma = nombrePrograma;
+	}
+
+
 
 	public HashMap<String, Procedimiento> getProcedimientos() {
 		return procedimientos;
@@ -56,12 +69,19 @@ public class DirectorioProcedimientos {
 	 * @return
 	 */
 	public Variable obtenerVariable(String nombreProcActual, String nombreVariable){
-		if( this.procedimientos.get(nombreProcActual).getVariables().containsKey(nombreVariable)){
-			return this.procedimientos.get(nombreProcActual).getVariables().get(nombreVariable);
-		} else if (this.procedimientos.get("program").getVariables().containsKey(nombreVariable)){
-			return this.procedimientos.get("program").getVariables().get(nombreVariable);
-		} else{
-			return null;
+		// revisar si el procedimiento tiene una tabla de variables asociada
+		if (this.procedimientos.get(nombreProcActual).getVariables() != null){
+			if( this.procedimientos.get(nombreProcActual).getVariables().containsKey(nombreVariable)){
+				return this.procedimientos.get(nombreProcActual).getVariables().get(nombreVariable);
+			} 
+		// revisar si el programa tiene variables globales
 		}
+		if (this.procedimientos.get(this.nombrePrograma).getVariables() != null) {
+			if (this.procedimientos.get(this.nombrePrograma).getVariables().containsKey(nombreVariable)){
+				return this.procedimientos.get(this.nombrePrograma).getVariables().get(nombreVariable);
+			}
+		} 
+		return null;
 	}
+	
 }

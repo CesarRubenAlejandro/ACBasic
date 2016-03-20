@@ -35,22 +35,15 @@ public class ACBasic
     {
      parser.prog();
      System.out.println("OK.");
-     for (String keyActual: dirProcedimientos.getProcedimientos().keySet()){
-          System.out.println("---------------------------");
-          Procedimiento actual = dirProcedimientos.getProcedimientos().get(keyActual);
-          System.out.print(actual.getNombreProcedimiento()+ ": ");
-          System.out.println(actual.getTipoProcedimiento());
-          for (String keyVariable : actual.getVariables().keySet()) {			Variable varActual = actual.getVariables().get(keyVariable);
-			System.out.print(varActual.getNombreVariable() + ": ");
-			System.out.print(varActual.getTipoVariable() + ": ");
-			System.out.println(varActual.getDireccionVariable());
-          }
-      }
+     System.out.println("CUADRUPLOS:");
+     for (int i=0; i<20; i++) {		 System.out.println(i + ": " + matrizCuadruplos[i][0] + " " + matrizCuadruplos[i][1] + " "
+		 + matrizCuadruplos[i][2] + " " + matrizCuadruplos[i][3]);
+     }
           
       } catch (Exception e)
       {
         System.out.println("NOK.");
-        System.out.println(e.getMessage());
+       e.printStackTrace();
       }
       catch (Error e)
       {
@@ -72,6 +65,14 @@ public class ACBasic
       	break;
       case 3:
         System.out.println("Error: Parametro repetido:" + detail);
+		System.exit(0);
+      	break;
+      case 4:
+      	System.out.println("Error: Variable no definida:" + detail);
+		System.exit(0);
+      	break;
+      case 5:
+      	System.out.println("Error: Tipos no coinciden:" + detail);
 		System.exit(0);
       	break;
           }  }
@@ -155,6 +156,8 @@ void prog() :
     dirProcedimientos = new DirectorioProcedimientos();  }
    idPrograma =  <ID >
    {
+     	// guardar el nombre del programa en el directorio de procedimientos
+     	dirProcedimientos.setNombrePrograma(idPrograma.toString());
      	// guardar el id del procedimiento actual
 		procedimientoActual = idPrograma.toString();
 		// crear un objeto procedimiento auxiliar para guardar info del procedimiento program
@@ -340,17 +343,11 @@ void body1():
 void assign():
 {}
 {
-  [<CORIZQ > exp() < CORDER >] <IGUAL > exp() < PYC > 
-}
-
-void exp():
-{}
-{
-  e1()
+  [<CORIZQ > exp() < CORDER >] <IGUAL >  {
+    // meter operador de asignacion a operadores
+    pilaOperadores.push(Codigos.ASSIGN);  } exp()
   {
-    // revisar si el tope es AND u OR
-    if (pilaOperadores.peek()== Codigos.AND || pilaOperadores.peek()== Codigos.OR) {
-		int operador = pilaOperadores.pop();
+    	int operador = pilaOperadores.pop();
 		int operando2 = pilaOperandos.pop();
 		int operando1 = pilaOperandos.pop();
 		int tipo2 = pilaTipos.pop();
@@ -360,16 +357,49 @@ void exp():
 		if(tipoRes != Codigos.ERROR) {
 			// generar cuadruplo
 		  	matrizCuadruplos[contadorCuadruplo][0] = operador;
-		  	matrizCuadruplos[contadorCuadruplo][1] = operando1;
-		  	matrizCuadruplos[contadorCuadruplo][2] = operando2;
-		  	int direccionRes = ManejadorMemoria.getMemoriaTemporal(tipoRes);
-		  	matrizCuadruplos[contadorCuadruplo][3] = direccionRes;
-		  	//guardar resultado en pila operandos
-		  	pilaOperandos.push(direccionRes);
-		  	pilaTipos.push(tipoRes);
+		  	matrizCuadruplos[contadorCuadruplo][1] = operando2;
+		  	matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
+		  	matrizCuadruplos[contadorCuadruplo][3] = operando1;
+		  	contadorCuadruplo++;
+		  	
 		} else {
 		  // ERROR
-		}	
+		  errorHandler(5, tipo1 + " y " +tipo2);
+		}	  }
+   < PYC > 
+}
+
+void exp():
+{}
+{
+  e1()
+  {
+    // revisar si el tope es AND u OR
+    if (!pilaOperadores.empty()) {
+	    if (pilaOperadores.peek()== Codigos.AND || pilaOperadores.peek()== Codigos.OR) {
+			int operador = pilaOperadores.pop();
+			int operando2 = pilaOperandos.pop();
+			int operando1 = pilaOperandos.pop();
+			int tipo2 = pilaTipos.pop();
+			int tipo1 = pilaTipos.pop();
+			int tipoRes = cuboSemantico.getCubo()[tipo1][tipo2][Codigos.OPLOGIC];
+			// revisar si combinacion de tipos es permitida
+			if(tipoRes != Codigos.ERROR) {
+				// generar cuadruplo
+			  	matrizCuadruplos[contadorCuadruplo][0] = operador;
+			  	matrizCuadruplos[contadorCuadruplo][1] = operando1;
+			  	matrizCuadruplos[contadorCuadruplo][2] = operando2;
+			  	int direccionRes = ManejadorMemoria.getMemoriaTemporal(tipoRes);
+			  	matrizCuadruplos[contadorCuadruplo][3] = direccionRes;
+			  	contadorCuadruplo++;
+			  	//guardar resultado en pila operandos
+			  	pilaOperandos.push(direccionRes);
+			  	pilaTipos.push(tipoRes);
+			} else {
+			  // ERROR
+			  errorHandler(5, tipo1 + " y " +tipo2);
+			}
+		}
     }   
   }
   ((< AND > {pilaOperadores.push(Codigos.AND);}
@@ -379,7 +409,41 @@ void exp():
 void e1():
 {}
 {
-  e2() [(< MENOR > | < MAYOR > | < MENORIG > | < MAYORIG > | < IGUALIG > | < DIFERENTE > ) e2()]
+  e2() [(< MENOR > {pilaOperadores.push(Codigos.MENOR);} | < MAYOR > {pilaOperadores.push(Codigos.MAYOR);}
+  | < MENORIG > {pilaOperadores.push(Codigos.MENORIG);} | < MAYORIG > {pilaOperadores.push(Codigos.MAYORIG);}
+  | < IGUALIG > {pilaOperadores.push(Codigos.IGUAL);} | < DIFERENTE > {pilaOperadores.push(Codigos.DIFERENTE);})
+   e2() {
+    // revisar si el tope es operador relacional
+    
+    if (!pilaOperadores.empty())    {
+	    if (pilaOperadores.peek()== Codigos.MENOR || pilaOperadores.peek()== Codigos.MAYOR
+	    || pilaOperadores.peek()== Codigos.MENORIG || pilaOperadores.peek()== Codigos.MAYORIG
+	    || pilaOperadores.peek()== Codigos.IGUAL || pilaOperadores.peek()== Codigos.DIFERENTE) {
+			int operador = pilaOperadores.pop();
+			int operando2 = pilaOperandos.pop();
+			int operando1 = pilaOperandos.pop();
+			int tipo2 = pilaTipos.pop();
+			int tipo1 = pilaTipos.pop();
+			int tipoRes = cuboSemantico.getCubo()[tipo1][tipo2][Codigos.OPREL];
+			// revisar si combinacion de tipos es permitida
+			if(tipoRes != Codigos.ERROR) {
+				// generar cuadruplo
+			  	matrizCuadruplos[contadorCuadruplo][0] = operador;
+			  	matrizCuadruplos[contadorCuadruplo][1] = operando1;
+			  	matrizCuadruplos[contadorCuadruplo][2] = operando2;
+			  	int direccionRes = ManejadorMemoria.getMemoriaTemporal(tipoRes);
+			  	matrizCuadruplos[contadorCuadruplo][3] = direccionRes;
+			  	contadorCuadruplo++;
+			  	//guardar resultado en pila operandos
+			  	pilaOperandos.push(direccionRes);
+			  	pilaTipos.push(tipoRes);
+			} else {
+			  // ERROR
+			  errorHandler(5, tipo1 + " y " +tipo2);
+			}	
+	    }
+  	}    
+  }]
 }
 
 void e2():
@@ -388,28 +452,33 @@ void e2():
   term()
 {
     // revisar si el tope es + o -
-    if (pilaOperadores.peek()== Codigos.SUMA || pilaOperadores.peek()== Codigos.RESTA) {
-		int operador = pilaOperadores.pop();
-		int operando2 = pilaOperandos.pop();
-		int operando1 = pilaOperandos.pop();
-		int tipo2 = pilaTipos.pop();
-		int tipo1 = pilaTipos.pop();
-		int tipoRes = cuboSemantico.getCubo()[tipo1][tipo2][operador];
-		// revisar si combinacion de tipos es permitida
-		if(tipoRes != Codigos.ERROR) {
-			// generar cuadruplo
-		  	matrizCuadruplos[contadorCuadruplo][0] = operador;
-		  	matrizCuadruplos[contadorCuadruplo][1] = operando1;
-		  	matrizCuadruplos[contadorCuadruplo][2] = operando2;
-		  	int direccionRes = ManejadorMemoria.getMemoriaTemporal(tipoRes);
-		  	matrizCuadruplos[contadorCuadruplo][3] = direccionRes;
-		  	//guardar resultado en pila operandos
-		  	pilaOperandos.push(direccionRes);
-		  	pilaTipos.push(tipoRes);
-		} else {
-		  // ERROR
-		}	
-    }    
+    
+    if (!pilaOperadores.empty()) { 
+	    if (pilaOperadores.peek()== Codigos.SUMA || pilaOperadores.peek()== Codigos.RESTA) {
+			int operador = pilaOperadores.pop();
+			int operando2 = pilaOperandos.pop();
+			int operando1 = pilaOperandos.pop();
+			int tipo2 = pilaTipos.pop();
+			int tipo1 = pilaTipos.pop();
+			int tipoRes = cuboSemantico.getCubo()[tipo1][tipo2][operador];
+			// revisar si combinacion de tipos es permitida
+			if(tipoRes != Codigos.ERROR) {
+				// generar cuadruplo
+			  	matrizCuadruplos[contadorCuadruplo][0] = operador;
+			  	matrizCuadruplos[contadorCuadruplo][1] = operando1;
+			  	matrizCuadruplos[contadorCuadruplo][2] = operando2;
+			  	int direccionRes = ManejadorMemoria.getMemoriaTemporal(tipoRes);
+			  	matrizCuadruplos[contadorCuadruplo][3] = direccionRes;
+			  	contadorCuadruplo++;
+			  	//guardar resultado en pila operandos
+			  	pilaOperandos.push(direccionRes);
+			  	pilaTipos.push(tipoRes);
+			} else {
+			  // ERROR
+			  errorHandler(5, tipo1 + " y " +tipo2);
+			}	
+    	}   
+  	}
   }
   ((< MAS > {pilaOperadores.push(Codigos.SUMA);}
   | < MENOS > {pilaOperadores.push(Codigos.RESTA);}) term())*
@@ -420,26 +489,31 @@ void term():
 {
   fact()  {
     // revisar si el tope es * o /
-    if (pilaOperadores.peek()== Codigos.MULT || pilaOperadores.peek()== Codigos.DIV) {
-		int operador = pilaOperadores.pop();
-		int operando2 = pilaOperandos.pop();
-		int operando1 = pilaOperandos.pop();
-		int tipo2 = pilaTipos.pop();
-		int tipo1 = pilaTipos.pop();
-		int tipoRes = cuboSemantico.getCubo()[tipo1][tipo2][operador];
-		// revisar si combinacion de tipos es permitida
-		if(tipoRes != Codigos.ERROR) {
-			// generar cuadruplo
-		  	matrizCuadruplos[contadorCuadruplo][0] = operador;
-		  	matrizCuadruplos[contadorCuadruplo][1] = operando1;
-		  	matrizCuadruplos[contadorCuadruplo][2] = operando2;
-		  	int direccionRes = ManejadorMemoria.getMemoriaTemporal(tipoRes);
-		  	matrizCuadruplos[contadorCuadruplo][3] = direccionRes;
-		  	//guardar resultado en pila operandos
-		  	pilaOperandos.push(direccionRes);
-		  	pilaTipos.push(tipoRes);		} else {
-		  // ERROR		}	
-    }     }
+    
+    if (!pilaOperadores.empty()) {       
+	    if (pilaOperadores.peek()== Codigos.MULT || pilaOperadores.peek()== Codigos.DIV) {
+			int operador = pilaOperadores.pop();
+			int operando2 = pilaOperandos.pop();
+			int operando1 = pilaOperandos.pop();
+			int tipo2 = pilaTipos.pop();
+			int tipo1 = pilaTipos.pop();
+			int tipoRes = cuboSemantico.getCubo()[tipo1][tipo2][operador];
+			// revisar si combinacion de tipos es permitida
+			if(tipoRes != Codigos.ERROR) {
+				// generar cuadruplo
+			  	matrizCuadruplos[contadorCuadruplo][0] = operador;
+			  	matrizCuadruplos[contadorCuadruplo][1] = operando1;
+			  	matrizCuadruplos[contadorCuadruplo][2] = operando2;
+			  	int direccionRes = ManejadorMemoria.getMemoriaTemporal(tipoRes);
+			  	matrizCuadruplos[contadorCuadruplo][3] = direccionRes;
+			  	contadorCuadruplo++;
+			  	//guardar resultado en pila operandos
+			  	pilaOperandos.push(direccionRes);
+			  	pilaTipos.push(tipoRes);			} else {
+			  // ERROR
+			  errorHandler(5, tipo1 + " y " +tipo2);			}	
+	    }
+	}   }
   ((< POR > {pilaOperadores.push(Codigos.MULT);}
   | < ENTRE >{pilaOperadores.push(Codigos.DIV);}) fact())*
 }
@@ -469,7 +543,8 @@ void fact3():
    // buscar que exista el id
    Variable varActual = dirProcedimientos.obtenerVariable(procedimientoActual, id.toString()); 
    if ( varActual == null) {
-     // ERROR   } else {
+     // ERROR
+     errorHandler(4, id.toString());   } else {
      // meter direccion y tipo a las pilas
      pilaOperandos.push(varActual.getDireccionVariable());
      pilaTipos.push(varActual.getTipoVariable());   }
@@ -503,13 +578,34 @@ void cond():
 void write():
 {}
 {
-  < PRINT > <PARIZQ > exp() < PARDER > <PYC >
+  < PRINT > <PARIZQ > exp()  {
+    int resultado = pilaOperandos.pop();
+    // generar cuadruplo de print
+    matrizCuadruplos[contadorCuadruplo][0] = Codigos.PRINT;
+  	matrizCuadruplos[contadorCuadruplo][1] = Codigos.NULO;
+  	matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
+  	matrizCuadruplos[contadorCuadruplo][3] = resultado;
+  	contadorCuadruplo++;  }
+   < PARDER > <PYC >
 }
 
 void read():
-{}
+{Token id;}
 {
-  < READ > <PARIZQ > <ID > [<CORIZQ > exp() < CORDER >] < PARDER > <PYC >
+  < READ > <PARIZQ > id=<ID > [<CORIZQ > exp() < CORDER >] < PARDER >  {
+    // buscar que exista el id
+   Variable varActual = dirProcedimientos.obtenerVariable(procedimientoActual, id.toString()); 
+   if ( varActual == null) {
+     // ERROR
+     errorHandler(4, id.toString());
+   } else {
+      // generar cuadruplo de print 
+      matrizCuadruplos[contadorCuadruplo][0] = Codigos.READ;
+      matrizCuadruplos[contadorCuadruplo][1] = Codigos.NULO;
+      matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
+      matrizCuadruplos[contadorCuadruplo][3] = varActual.getDireccionVariable();
+      contadorCuadruplo++;
+   }   } <PYC >
 }
 
 void cycle():
@@ -540,7 +636,19 @@ void main():
 }
 
 void assignllam():
-{}
+{Token id;}
 {
-  < ID > (llam() | assign())
+  id = < ID > (llam()
+  | {
+   // buscar que exista el id
+   Variable varActual = dirProcedimientos.obtenerVariable(procedimientoActual, id.toString()); 
+   if ( varActual == null) {
+     // ERROR
+     errorHandler(4, id.toString());
+   } else {
+     // meter direccion y tipo a las pilas
+     pilaOperandos.push(varActual.getDireccionVariable());
+     pilaTipos.push(varActual.getTipoVariable());
+   } 
+ } assign())
 }
