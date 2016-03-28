@@ -16,6 +16,13 @@ public class ManejadorMemoria {
 	private static int contadorTemporalString = 9000;
 	private static int contadorTemporalBool = 10000;
 	
+	// constantes
+	private static int contadorCteInt = 11000;
+	private static int contadorCteFloat = 12000;
+	private static int contadorCteChar = 13000;
+	private static int contadorCteString = 14000;
+	private static int contadorCteBool = 15000;
+	
 	public static int getMemoria(int tipoVariable) {
 		switch (tipoVariable) {
 		case Codigos.INT:
@@ -33,6 +40,28 @@ public class ManejadorMemoria {
 		case Codigos.BOOL:
 			contadorBool++;
 			return contadorBool-1;
+		default:
+			return 0;
+		}	
+	}
+	
+	public static int getMemoriaConstante(int tipoVariable) {
+		switch (tipoVariable) {
+		case Codigos.INT:
+			contadorCteInt++;
+			return contadorCteInt-1;
+		case Codigos.FLOAT:
+			contadorCteFloat++;
+			return contadorCteFloat-1;
+		case Codigos.CHAR:
+			contadorCteChar++;
+			return contadorCteChar-1;
+		case Codigos.STRING:
+			contadorCteString++;
+			return contadorCteString-1;
+		case Codigos.BOOL:
+			contadorCteBool++;
+			return contadorCteBool-1;
 		default:
 			return 0;
 		}	

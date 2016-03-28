@@ -15,8 +15,6 @@ public class Procedimiento {
 	// mapa de variables declaradas dentro de este procedimiento en el programa
 	// la llave String es el id de la variable
 	private HashMap<String, Variable> variables;
-	// mapa para los procedimientos locales (condiciones y ciclos)
-	private HashMap<String, Procedimiento> bloquesLocales; 
 	
 	public Procedimiento() {
 		super();
@@ -46,13 +44,6 @@ public class Procedimiento {
 		this.variables = variables;
 	}
 
-	public HashMap<String, Procedimiento> getBloquesLocales() {
-		return bloquesLocales;
-	}
-
-	public void setBloquesLocales(HashMap<String, Procedimiento> bloquesLocales) {
-		this.bloquesLocales = bloquesLocales;
-	}
 	
 	/**
 	 * Metodo para crear la tabla de variables del procedimiento actual
@@ -61,13 +52,6 @@ public class Procedimiento {
 		this.variables = new HashMap<String, Variable>();
 	}
 	
-	/**
-	 * Metodo para crear la tabla de procedimientos locales del procedimiento actual
-	 */
-	public void crearTablaDeBloquesLocales(){
-		this.bloquesLocales = new HashMap<String,Procedimiento>();
-
-	}
 	
 	/**
 	 * Metodo para dar de alta una variable en el directorio de variables del procedimiento actual

@@ -188,10 +188,23 @@ int tipo():
   | < BOOL > {return Codigos.BOOL;}
 }
 
-void cte():
-{}
+Constante cte():
+{Token valor; int tipo;}
 {
-  < CTEI > | < CTEF > | < TRUE > | < FALSE > | < CTESTR > | < CTECHAR >
+  ( valor=< CTEI > {tipo = Codigos.INT;}
+  | valor=< CTEF > {tipo = Codigos.FLOAT;} 
+  | valor=< TRUE > {tipo = Codigos.BOOL;} 
+  | valor=< FALSE > {tipo = Codigos.BOOL;} 
+  | valor=< CTESTR > {tipo = Codigos.STRING;} 
+  | valor=< CTECHAR > {tipo = Codigos.CHAR;} )
+  {
+    // agregar la constante al directorio de procedimientos si esta no existe ya
+    
+    if(dirProcedimientos.existeConstante(valor.toString())) {
+      	return dirProcedimientos.getConstantes().get(valor.toString());    } else {
+      	Constante auxiliar = new Constante(tipo, ManejadorMemoria.getMemoriaConstante(tipo) , valor.toString());
+      	dirProcedimientos.getConstantes().put(valor.toString(), auxiliar);
+      	return auxiliar;    }  }
 }
 
 void defarr():
@@ -366,6 +379,18 @@ void body():
 }
 
 void body1():
+{}
+{
+  assignllam() | cond() | read() | write() | cycle()
+}
+
+void minibody():
+{}
+{
+  < LLAIZQ > (minibody1())* [<RETURN > exp() < PYC >] <LLADER >
+}
+
+void minibody1():
 {}
 {
   assignllam() | cond() | read() | write() | cycle()
@@ -568,9 +593,13 @@ void fact():
 }
 
 void fact1():
-{}
+{Constante cons;}
 {
-  cte()
+  cons = cte()
+  {
+	// meter a la pila de operandos la direccion de la constante y a la pila de tipos el tipo de la constante
+    pilaOperandos.push(cons.getDireccionConstante());
+    pilaTipos.push(cons.getTipoConstante());  }
 }
 
 void fact2():
@@ -619,7 +648,7 @@ void fact5():
 void cond():
 {}
 {
-  < IF > <PARIZQ > exp() < PARDER > body() (< ELIF > <PARIZQ > exp() < PARDER > body())* [<ELSE > body()]
+  < IF > <PARIZQ > exp() < PARDER > minibody() (< ELIF > <PARIZQ > exp() < PARDER > minibody())* [<ELSE > minibody()]
 }
 
 void write():
@@ -662,7 +691,7 @@ void read():
 void cycle():
 {}
 {
-  < WHILE > <PARIZQ > exp() < PARDER > body()
+  < WHILE > <PARIZQ > exp() < PARDER > minibody()
 }
 
 void llam():
