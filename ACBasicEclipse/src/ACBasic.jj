@@ -218,8 +218,9 @@ void vars():
 {
   < VAR >
   {
-    // crear tabla de variables para el procedimiento actual
-    dirProcedimientos.getProcedimientos().get(procedimientoActual).crearTablaDeVariables();
+    // crear tabla de variables para el procedimiento actual si no existe
+    if (dirProcedimientos.getProcedimientos().get(procedimientoActual).getVariables() == null){      dirProcedimientos.getProcedimientos().get(procedimientoActual).crearTablaDeVariables();
+    }
   }
    vars1() < PYC > (vars1() < PYC >)*
 }
@@ -327,6 +328,7 @@ void func():
  }
  <PARIZQ > param() < PARDER > body()
  {
+
    // borrar tabla de variables para el procedimiento actual
    dirProcedimientos.getProcedimientos().get(procedimientoActual).setVariables(null);
  }
@@ -355,15 +357,11 @@ void param1():
     if(dirProcedimientos.getProcedimientos().get(procedimientoActual).getVariables()==null){
      dirProcedimientos.getProcedimientos().get(procedimientoActual).crearTablaDeVariables();
 	}
-	// crear objeto variable y guardar el tipo y scope
-    Variable paramAux = new Variable();
-    paramAux.setTipoVariable(tipoParam);
-    paramAux.setScope("local");
   }
    [< AMP >] nombreParam = <ID >
    {
-     // guardar el nombre del parametro en el objeto
-     paramAux.setNombreVariable(nombreParam.toString());
+     // crear objeto variable y guardar el tipo y scope
+    Variable paramAux = new Variable(nombreParam.toString(), tipoParam, "local");
 	// dar de alta el parametro en el directorio de variables del procedimiento actual
      if(!dirProcedimientos.getProcedimientos().get(procedimientoActual).agregarVariable(paramAux)){
 		// reportar error si ya existe una variable con ese nombre
@@ -620,7 +618,7 @@ void fact3():
  id = < ID >
  {
    // buscar que exista el id
-   Variable varActual = dirProcedimientos.obtenerVariable(procedimientoActual, id.toString()); 
+   Variable varActual = dirProcedimientos.obtenerVariable(procedimientoActual, id.toString());
    if ( varActual == null) {
      // ERROR
      errorHandler(4, id.toString());

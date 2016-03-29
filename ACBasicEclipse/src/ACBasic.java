@@ -207,8 +207,10 @@ public class ACBasic implements ACBasicConstants {
 
   static final public void vars() throws ParseException {
     jj_consume_token(VAR);
-    // crear tabla de variables para el procedimiento actual
-    dirProcedimientos.getProcedimientos().get(procedimientoActual).crearTablaDeVariables();
+    // crear tabla de variables para el procedimiento actual si no existe
+    if (dirProcedimientos.getProcedimientos().get(procedimientoActual).getVariables() == null){
+      dirProcedimientos.getProcedimientos().get(procedimientoActual).crearTablaDeVariables();
+    }
     vars1();
     jj_consume_token(PYC);
     label_3:
@@ -431,10 +433,6 @@ public class ACBasic implements ACBasicConstants {
     if(dirProcedimientos.getProcedimientos().get(procedimientoActual).getVariables()==null){
      dirProcedimientos.getProcedimientos().get(procedimientoActual).crearTablaDeVariables();
         }
-        // crear objeto variable y guardar el tipo y scope
-    Variable paramAux = new Variable();
-    paramAux.setTipoVariable(tipoParam);
-    paramAux.setScope("local");
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case AMP:
       jj_consume_token(AMP);
@@ -444,8 +442,8 @@ public class ACBasic implements ACBasicConstants {
       ;
     }
     nombreParam = jj_consume_token(ID);
-     // guardar el nombre del parametro en el objeto
-     paramAux.setNombreVariable(nombreParam.toString());
+     // crear objeto variable y guardar el tipo y scope
+    Variable paramAux = new Variable(nombreParam.toString(), tipoParam, "local");
         // dar de alta el parametro en el directorio de variables del procedimiento actual
      if(!dirProcedimientos.getProcedimientos().get(procedimientoActual).agregarVariable(paramAux)){
                 // reportar error si ya existe una variable con ese nombre
