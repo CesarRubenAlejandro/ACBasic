@@ -45,4 +45,7 @@ public class Codigos {
 	
 	public static final int FONDOFALSO = 10;
 	
+	public static final int GOTO = 11;
+	public static final int GOTOF = 12;
+	
 }

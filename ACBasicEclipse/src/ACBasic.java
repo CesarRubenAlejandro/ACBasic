@@ -7,6 +7,7 @@ public class ACBasic implements ACBasicConstants {
   private static Stack <Integer> pilaOperadores;
   private static Stack <Integer> pilaOperandos;
   private static Stack <Integer> pilaTipos;
+  private static Stack <Integer> pilaSaltos;
   private static CuboSemantico cuboSemantico;
   private static int[][] matrizCuadruplos;
   private static int contadorCuadruplo;
@@ -16,6 +17,7 @@ public class ACBasic implements ACBasicConstants {
         pilaOperadores = new Stack<Integer>();
         pilaOperandos = new Stack<Integer>();
         pilaTipos = new Stack<Integer>();
+        pilaSaltos = new Stack<Integer>();
         cuboSemantico = new CuboSemantico();
         matrizCuadruplos = new int[1000][4];
         contadorCuadruplo = 0;
@@ -66,7 +68,10 @@ public class ACBasic implements ACBasicConstants {
         System.out.println("Error: Tipos no coinciden:" + detail);
                 System.exit(0);
         break;
-
+      case 6:
+        System.out.println("Error: Expresion no es booleana:" + detail);
+        System.exit(0);
+        break;
     }
   }
 
@@ -974,6 +979,19 @@ public class ACBasic implements ACBasicConstants {
     jj_consume_token(PARIZQ);
     exp();
     jj_consume_token(PARDER);
+        int auxTipo = pilaTipos.pop();
+    if (auxTipo != Codigos.BOOL){
+                // ERROR
+                errorHandler(6, "" + auxTipo);
+        } else {
+                int direccionRes = pilaOperandos.pop();
+                // generar cuadruplo gotof
+                matrizCuadruplos[contadorCuadruplo][0] = Codigos.GOTOF;
+                matrizCuadruplos[contadorCuadruplo][1] = direccionRes;
+                matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
+                contadorCuadruplo++;
+                pilaSaltos.push(contadorCuadruplo-1);
+          }
     minibody();
     label_12:
     while (true) {
@@ -986,20 +1004,54 @@ public class ACBasic implements ACBasicConstants {
         break label_12;
       }
       jj_consume_token(ELIF);
+          // generar cuadruplo goto
+          matrizCuadruplos[contadorCuadruplo][0] = Codigos.GOTO;
+          matrizCuadruplos[contadorCuadruplo][1] = Codigos.NULO;
+          matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
+          contadorCuadruplo++;
+          int falso = pilaSaltos.pop();
+          matrizCuadruplos[falso][3] = contadorCuadruplo;
+          pilaSaltos.push(contadorCuadruplo-1);
       jj_consume_token(PARIZQ);
       exp();
       jj_consume_token(PARDER);
+                auxTipo = pilaTipos.pop();
+            if (auxTipo != Codigos.BOOL){
+                        // ERROR
+                        errorHandler(6, "" + auxTipo);
+                } else {
+                        int direccionRes = pilaOperandos.pop();
+                        // generar cuadruplo gotof
+                        matrizCuadruplos[contadorCuadruplo][0] = Codigos.GOTOF;
+                        matrizCuadruplos[contadorCuadruplo][1] = direccionRes;
+                        matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
+                        contadorCuadruplo++;
+                        pilaSaltos.push(contadorCuadruplo-1);
+                  }
       minibody();
     }
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case ELSE:
       jj_consume_token(ELSE);
+          // generar cuadruplo goto
+          matrizCuadruplos[contadorCuadruplo][0] = Codigos.GOTO;
+          matrizCuadruplos[contadorCuadruplo][1] = Codigos.NULO;
+          matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
+          contadorCuadruplo++;
+          int falso = pilaSaltos.pop();
+          matrizCuadruplos[falso][3] = contadorCuadruplo;
+          pilaSaltos.push(contadorCuadruplo-1);
       minibody();
       break;
     default:
       jj_la1[37] = jj_gen;
       ;
     }
+    while (!pilaSaltos.isEmpty())
+    {
+                int fin = pilaSaltos.pop();
+                matrizCuadruplos[fin][3] = contadorCuadruplo;
+        }
   }
 
   static final public void write() throws ParseException {
@@ -1051,10 +1103,34 @@ public class ACBasic implements ACBasicConstants {
 
   static final public void cycle() throws ParseException {
     jj_consume_token(WHILE);
+              pilaSaltos.push(contadorCuadruplo);
     jj_consume_token(PARIZQ);
     exp();
     jj_consume_token(PARDER);
+    int auxTipo = pilaTipos.pop();
+        if (auxTipo != Codigos.BOOL){
+                // ERROR
+                errorHandler(6, "" + auxTipo);
+        } else {
+          int direccionRes = pilaOperandos.pop();
+          // generar cuadruplo gotof
+          matrizCuadruplos[contadorCuadruplo][0] = Codigos.GOTOF;
+          matrizCuadruplos[contadorCuadruplo][1] = direccionRes;
+      matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
+          contadorCuadruplo++;
+          pilaSaltos.push(contadorCuadruplo-1);
+        }
     minibody();
+        int falso = pilaSaltos.pop();
+        int retorno = pilaSaltos.pop();
+        // generar cuadruplo goto
+        matrizCuadruplos[contadorCuadruplo][0] = Codigos.GOTO;
+        matrizCuadruplos[contadorCuadruplo][1] = Codigos.NULO;
+        matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
+        matrizCuadruplos[contadorCuadruplo][3] = retorno;
+        contadorCuadruplo++;
+        //rellenar falso con contador
+        matrizCuadruplos[falso][3] = contadorCuadruplo;
   }
 
   static final public void llam() throws ParseException {
