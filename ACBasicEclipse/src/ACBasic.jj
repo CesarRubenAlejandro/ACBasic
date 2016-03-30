@@ -237,7 +237,7 @@ void vars1():
 }
 
 void vars2():
-{int tipoVariable; Token nombreVariable;}
+{int tipoVariable; Token nombreVariable; Constante cons;}
 {
   tipoVariable = tipo() nombreVariable=< ID >
   {
@@ -254,7 +254,23 @@ void vars2():
 	  // si ya existe una variable en este directorio con el mismo nombre, reportar error
       errorHandler(2,nombreVariable.toString());
     }
-  }[<IGUAL > cte()]
+  }[<IGUAL > cons = cte()
+	{
+	  int tipoRes = cuboSemantico.getCubo()[tipoVariable][cons.getTipoConstante()][Codigos.ASSIGN];
+		// revisar si combinacion de tipos es permitida
+		if(tipoRes != Codigos.ERROR) {
+			// generar cuadruplo
+		  	matrizCuadruplos[contadorCuadruplo][0] = Codigos.ASSIGN;
+		  	matrizCuadruplos[contadorCuadruplo][1] = cons.getDireccionConstante();
+		  	matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
+		  	matrizCuadruplos[contadorCuadruplo][3] = varAuxiliar.getDireccionVariable();
+		  	contadorCuadruplo++;
+		  	
+		} else {
+		  // ERROR
+		  errorHandler(5, tipoVariable + " y " + cons.getTipoConstante());
+		}	}
+  ]
   (< COMA > nombreVariable=<ID >
 	{
    	// crear objeto variable y darlo de alta en directorio de variables del procedimiento actual
@@ -264,7 +280,22 @@ void vars2():
       		errorHandler(2,nombreVariable.toString());
     	}
     }
-    [<IGUAL > cte()] )* 
+    [<IGUAL > cons = cte() {
+	   int tipoRes = cuboSemantico.getCubo()[tipoVariable][cons.getTipoConstante()][Codigos.ASSIGN];
+		// revisar si combinacion de tipos es permitida
+		if(tipoRes != Codigos.ERROR) {
+			// generar cuadruplo
+		  	matrizCuadruplos[contadorCuadruplo][0] = Codigos.ASSIGN;
+		  	matrizCuadruplos[contadorCuadruplo][1] = cons.getDireccionConstante();
+		  	matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
+		  	matrizCuadruplos[contadorCuadruplo][3] = varAuxiliar.getDireccionVariable();
+		  	contadorCuadruplo++;
+		  	
+		} else {
+		  // ERROR
+		  errorHandler(5, tipoVariable + " y " + cons.getTipoConstante());
+		}
+	} ])* 
 }
 
 void vars3():

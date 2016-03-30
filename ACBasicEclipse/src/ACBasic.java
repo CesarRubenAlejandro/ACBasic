@@ -258,7 +258,7 @@ public class ACBasic implements ACBasicConstants {
   }
 
   static final public void vars2() throws ParseException {
- int tipoVariable; Token nombreVariable;
+ int tipoVariable; Token nombreVariable; Constante cons;
     tipoVariable = tipo();
     nombreVariable = jj_consume_token(ID);
     // asignar el tipo de scope de la variable
@@ -277,7 +277,21 @@ public class ACBasic implements ACBasicConstants {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case IGUAL:
       jj_consume_token(IGUAL);
-      cte();
+      cons = cte();
+          int tipoRes = cuboSemantico.getCubo()[tipoVariable][cons.getTipoConstante()][Codigos.ASSIGN];
+                // revisar si combinacion de tipos es permitida
+                if(tipoRes != Codigos.ERROR) {
+                        // generar cuadruplo
+                        matrizCuadruplos[contadorCuadruplo][0] = Codigos.ASSIGN;
+                        matrizCuadruplos[contadorCuadruplo][1] = cons.getDireccionConstante();
+                        matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
+                        matrizCuadruplos[contadorCuadruplo][3] = varAuxiliar.getDireccionVariable();
+                        contadorCuadruplo++;
+
+                } else {
+                  // ERROR
+                  errorHandler(5, tipoVariable + " y " + cons.getTipoConstante());
+                }
       break;
     default:
       jj_la1[7] = jj_gen;
@@ -304,7 +318,21 @@ public class ACBasic implements ACBasicConstants {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
       case IGUAL:
         jj_consume_token(IGUAL);
-        cte();
+        cons = cte();
+           int tipoRes = cuboSemantico.getCubo()[tipoVariable][cons.getTipoConstante()][Codigos.ASSIGN];
+                // revisar si combinacion de tipos es permitida
+                if(tipoRes != Codigos.ERROR) {
+                        // generar cuadruplo
+                        matrizCuadruplos[contadorCuadruplo][0] = Codigos.ASSIGN;
+                        matrizCuadruplos[contadorCuadruplo][1] = cons.getDireccionConstante();
+                        matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
+                        matrizCuadruplos[contadorCuadruplo][3] = varAuxiliar.getDireccionVariable();
+                        contadorCuadruplo++;
+
+                } else {
+                  // ERROR
+                  errorHandler(5, tipoVariable + " y " + cons.getTipoConstante());
+                }
         break;
       default:
         jj_la1[9] = jj_gen;
