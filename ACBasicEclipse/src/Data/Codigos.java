@@ -50,5 +50,7 @@ public class Codigos {
 	
 	public static final int ENDPROC = 13;
 	public static final int ERA = 14;
+	public static final int PARAM = 15;
+	public static final int GOSUB = 16;
 	
 }

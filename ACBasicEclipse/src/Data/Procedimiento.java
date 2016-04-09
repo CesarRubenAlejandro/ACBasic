@@ -130,4 +130,19 @@ public class Procedimiento {
 		}
 	}
 	
+	/**
+	 * Metodo para comparar los parametros de una llamada con los parametros 
+	 * esperados en la funcion
+	 */
+	public boolean comparaParams(ArrayList <Integer> paramLlamada) {
+		if(paramLlamada.size() != this.getCantidadParametros()) {
+			return false;
+		}
+		for(int i=0; i<paramLlamada.size(); i++){
+			if (paramLlamada.get(i)!= this.tipoParams.get(i)){
+				return false;
+			}
+		}
+		return true;
+	}
 }

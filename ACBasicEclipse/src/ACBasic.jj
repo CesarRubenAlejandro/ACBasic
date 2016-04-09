@@ -10,6 +10,8 @@ options
 PARSER_BEGIN(ACBasic)
 import Data.*;
 import java.util.Stack;
+import java.util.ArrayList;
+
 public class ACBasic
 {
   private static DirectorioProcedimientos dirProcedimientos;
@@ -709,7 +711,7 @@ void fact4():
 }
 
 void fact5(String nombreProc):
-{}
+{ArrayList<Integer > argumentosParam; ArrayList<Integer > tiposParam;}
 {
   < PARIZQ >  {
     // generar cuadruplo ERA
@@ -717,7 +719,39 @@ void fact5(String nombreProc):
 	matrizCuadruplos[contadorCuadruplo][1] = Codigos.NULO;
 	matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
 	matrizCuadruplos[contadorCuadruplo][3] = dirProcedimientos.getProcedimientos().get(nombreProc).getIdentificadorProcedimiento();
-      }  exp() (< COMA > exp())* < PARDER > 
+	contadorCuadruplo++;
+	// inicializar listas
+	tiposParam = new ArrayList<Integer >();
+	argumentosParam = new ArrayList<Integer >();  }  exp()
+  {	// guardar la direccion del argumento y su tipo para su futura comparacion
+    argumentosParam.add( pilaOperandos.pop());
+    tiposParam.add( pilaTipos.pop());  }
+  (< COMA > exp()
+	{
+		// guardar la direccion del argumento y su tipo para su futura comparacion
+    	argumentosParam.add( pilaOperandos.pop());
+    	tiposParam.add( pilaTipos.pop());
+  	}
+  )* < PARDER >  {
+    // revisar que los tipos de la llamada coincidan con los parametros de la funcion
+
+	if(dirProcedimientos.getProcedimientos().get(nombreProc).comparaParams(tiposParam) ){
+		// generar cuadruplos de parametros
+		for (int i=0; i< argumentosParam.size(); i++){			matrizCuadruplos[contadorCuadruplo][0] = Codigos.PARAM;
+			matrizCuadruplos[contadorCuadruplo][1] = argumentosParam.get(i);
+			matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
+			matrizCuadruplos[contadorCuadruplo][3] = i;
+			contadorCuadruplo++;
+		}
+		// generar cuadruplo de GOSUB
+		matrizCuadruplos[contadorCuadruplo][0] = Codigos.GOSUB;
+		matrizCuadruplos[contadorCuadruplo][1] = Codigos.NULO;
+		matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
+		matrizCuadruplos[contadorCuadruplo][3] = dirProcedimientos.getProcedimientos().get(nombreProc).getIdentificadorProcedimiento();
+		contadorCuadruplo++;
+			} else {
+	  // ERROR LLAMADA	}
+	      }
 }
 
 void cond():
