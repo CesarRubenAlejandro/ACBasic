@@ -1,5 +1,6 @@
 package Data;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -15,6 +16,13 @@ public class Procedimiento {
 	// mapa de variables declaradas dentro de este procedimiento en el programa
 	// la llave String es el id de la variable
 	private HashMap<String, Variable> variables;
+	// numero de cuadruplo inicial
+	private int cuadruploInicial;
+	// tipos de los parametros
+	private ArrayList <Integer> tipoParams;
+	// tamaño
+	private TamañoProcedimiento tamaño;
+	
 	
 	public Procedimiento() {
 		super();
@@ -43,8 +51,23 @@ public class Procedimiento {
 	public void setVariables(HashMap<String, Variable> variables) {
 		this.variables = variables;
 	}
-
 	
+	public int getCuadruploInicial() {
+		return cuadruploInicial;
+	}
+
+	public void setCuadruploInicial(int cuadruploInicial) {
+		this.cuadruploInicial = cuadruploInicial;
+	}
+
+	public ArrayList<Integer> getTipoParams() {
+		return tipoParams;
+	}
+
+	public void setTipoParams(ArrayList<Integer> tipoParams) {
+		this.tipoParams = tipoParams;
+	}
+
 	/**
 	 * Metodo para crear la tabla de variables del procedimiento actual
 	 */
@@ -65,4 +88,12 @@ public class Procedimiento {
 			return true;
 		}
 	}
+	
+	/**
+	 * Método para obtener la cantidad de parametros
+	 */
+	public int getCantidadParametros() {
+		return this.tipoParams.size();
+	}
+	
 }
