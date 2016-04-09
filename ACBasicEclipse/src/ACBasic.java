@@ -11,6 +11,8 @@ public class ACBasic implements ACBasicConstants {
   private static CuboSemantico cuboSemantico;
   private static int[][] matrizCuadruplos;
   private static int contadorCuadruplo;
+  private static int direccionCuadruploMain;
+  private static int contadorProcedimientos;
 
   public static void main(String args []) throws ParseException {
     ACBasic parser = new ACBasic(System.in);
@@ -21,6 +23,8 @@ public class ACBasic implements ACBasicConstants {
         cuboSemantico = new CuboSemantico();
         matrizCuadruplos = new int[1000][4];
         contadorCuadruplo = 0;
+        direccionCuadruploMain = 0;
+        contadorProcedimientos = 0;
 
     System.out.println("Reading from standard input...");
     try
@@ -61,7 +65,7 @@ public class ACBasic implements ACBasicConstants {
                 System.exit(0);
         break;
       case 4:
-        System.out.println("Error: Variable no definida:" + detail);
+        System.out.println("Error: ID no definido:" + detail);
                 System.exit(0);
         break;
       case 5:
@@ -72,6 +76,7 @@ public class ACBasic implements ACBasicConstants {
         System.out.println("Error: Expresion no es booleana:" + detail);
         System.exit(0);
         break;
+
     }
   }
 
@@ -102,6 +107,9 @@ public class ACBasic implements ACBasicConstants {
       jj_la1[0] = jj_gen;
       ;
     }
+     // guardar la direccion donde se debe generar el cuadruplo GOTO main
+        direccionCuadruploMain = contadorCuadruplo;
+        contadorCuadruplo++;
     label_1:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -236,6 +244,7 @@ public class ACBasic implements ACBasicConstants {
       vars1();
       jj_consume_token(PYC);
     }
+     dirProcedimientos.getProcedimientos().get(procedimientoActual).llenaTamañoVar();
   }
 
   static final public void vars1() throws ParseException {
@@ -392,6 +401,10 @@ public class ACBasic implements ACBasicConstants {
    // guardar el nombre del procedimiento en el objeto
    procAux.setNombreProcedimiento(nombreProc.toString());
 
+   // guardar el identificador del procedimiento
+   procAux.setIdentificadorProcedimiento(contadorProcedimientos);
+   contadorProcedimientos++;
+
         // dar de alta el procedimiento en el directorio de procedimientos
    if (!dirProcedimientos.agregarProcedimiento(procAux)) {
           // reportar error si ya existe un procedimiento con este nombre
@@ -403,9 +416,17 @@ public class ACBasic implements ACBasicConstants {
     jj_consume_token(PARIZQ);
     param();
     jj_consume_token(PARDER);
+   // guardar el cuadruplo inicial del procedimiento
+        dirProcedimientos.getProcedimientos().get(procedimientoActual).setCuadruploInicial(contadorCuadruplo);
     body();
    // borrar tabla de variables para el procedimiento actual
    dirProcedimientos.getProcedimientos().get(procedimientoActual).setVariables(null);
+   // generar cuadruplo retorno
+        matrizCuadruplos[contadorCuadruplo][0] = Codigos.ENDPROC;
+        matrizCuadruplos[contadorCuadruplo][1] = Codigos.NULO;
+        matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
+        matrizCuadruplos[contadorCuadruplo][3] = Codigos.NULO;
+        contadorCuadruplo++;
   }
 
   static final public int func1() throws ParseException {
@@ -481,6 +502,9 @@ public class ACBasic implements ACBasicConstants {
      if(!dirProcedimientos.getProcedimientos().get(procedimientoActual).agregarVariable(paramAux)){
                 // reportar error si ya existe una variable con ese nombre
                 errorHandler(3, nombreParam.toString());
+     } else {
+       // guardar el tipo de parametro
+       dirProcedimientos.getProcedimientos().get(procedimientoActual).getTipoParams().add(paramAux.getTipoVariable());
      }
   }
 
@@ -662,6 +686,8 @@ public class ACBasic implements ACBasicConstants {
                                 //guardar resultado en pila operandos
                                 pilaOperandos.push(direccionRes);
                                 pilaTipos.push(tipoRes);
+                                // agregar al tamaño de procedimiento un temporal
+                                dirProcedimientos.getProcedimientos().get(procedimientoActual).getTamaño().setTamañoTemp(tipoRes);
                         } else {
                           // ERROR
                           errorHandler(5, tipo1 + " y " +tipo2);
@@ -762,6 +788,8 @@ public class ACBasic implements ACBasicConstants {
                                 //guardar resultado en pila operandos
                                 pilaOperandos.push(direccionRes);
                                 pilaTipos.push(tipoRes);
+                                // agregar al tamaño de procedimiento un temporal
+                                dirProcedimientos.getProcedimientos().get(procedimientoActual).getTamaño().setTamañoTemp(tipoRes);
                         } else {
                           // ERROR
                           errorHandler(5, tipo1 + " y " +tipo2);
@@ -798,6 +826,8 @@ public class ACBasic implements ACBasicConstants {
                                 //guardar resultado en pila operandos
                                 pilaOperandos.push(direccionRes);
                                 pilaTipos.push(tipoRes);
+                                // agregar al tamaño de procedimiento un temporal
+                                dirProcedimientos.getProcedimientos().get(procedimientoActual).getTamaño().setTamañoTemp(tipoRes);
                         } else {
                           // ERROR
                           errorHandler(5, tipo1 + " y " +tipo2);
@@ -858,6 +888,8 @@ public class ACBasic implements ACBasicConstants {
                                 //guardar resultado en pila operandos
                                 pilaOperandos.push(direccionRes);
                                 pilaTipos.push(tipoRes);
+                                // agregar al tamaño de procedimiento un temporal
+                                dirProcedimientos.getProcedimientos().get(procedimientoActual).getTamaño().setTamañoTemp(tipoRes);
                         } else {
                           // ERROR
                           errorHandler(5, tipo1 + " y " +tipo2);
@@ -947,13 +979,15 @@ public class ACBasic implements ACBasicConstants {
     id = jj_consume_token(ID);
    // buscar que exista el id
    Variable varActual = dirProcedimientos.obtenerVariable(procedimientoActual, id.toString());
-   if ( varActual == null) {
-     // ERROR
-     errorHandler(4, id.toString());
-   } else {
+   if ( varActual != null) {
      // meter direccion y tipo a las pilas
      pilaOperandos.push(varActual.getDireccionVariable());
      pilaTipos.push(varActual.getTipoVariable());
+   } else {
+      if (!dirProcedimientos.getProcedimientos().containsKey(id.toString())) {
+                // ERROR
+                errorHandler(4,id.toString());
+      }
    }
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case CORIZQ:
@@ -963,7 +997,7 @@ public class ACBasic implements ACBasicConstants {
         fact4();
         break;
       case PARIZQ:
-        fact5();
+        fact5(id.toString());
         break;
       default:
         jj_la1[33] = jj_gen;
@@ -983,8 +1017,13 @@ public class ACBasic implements ACBasicConstants {
     jj_consume_token(CORDER);
   }
 
-  static final public void fact5() throws ParseException {
+  static final public void fact5(String nombreProc) throws ParseException {
     jj_consume_token(PARIZQ);
+    // generar cuadruplo ERA
+        matrizCuadruplos[contadorCuadruplo][0] = Codigos.ERA;
+        matrizCuadruplos[contadorCuadruplo][1] = Codigos.NULO;
+        matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
+        matrizCuadruplos[contadorCuadruplo][3] = dirProcedimientos.getProcedimientos().get(nombreProc).getIdentificadorProcedimiento();
     exp();
     label_11:
     while (true) {
@@ -1183,6 +1222,12 @@ public class ACBasic implements ACBasicConstants {
 
   static final public void main() throws ParseException {
     jj_consume_token(MAIN);
+        // crear cuadruplo GOTO main
+        matrizCuadruplos[direccionCuadruploMain][0] = Codigos.GOTO;
+        matrizCuadruplos[direccionCuadruploMain][1] = Codigos.NULO;
+        matrizCuadruplos[direccionCuadruploMain][2] = Codigos.NULO;
+        matrizCuadruplos[direccionCuadruploMain][3] = contadorCuadruplo;
+
         // asignar procedimientoActual a main
         procedimientoActual ="main";
     // crear el procedimiento Main con nombre y tipo

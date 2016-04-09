@@ -22,11 +22,27 @@ public class Procedimiento {
 	private ArrayList <Integer> tipoParams;
 	// tamaño
 	private TamañoProcedimiento tamaño;
+	// identificador del procedimiento
+	private int identificadorProcedimiento;
 	
 	
 	public Procedimiento() {
 		super();
+		tipoParams = new ArrayList<Integer>();
+		tamaño = new TamañoProcedimiento();
 	}
+
+	public int getIdentificadorProcedimiento() {
+		return identificadorProcedimiento;
+	}
+
+
+
+	public void setIdentificadorProcedimiento(int identificadorProcedimiento) {
+		this.identificadorProcedimiento = identificadorProcedimiento;
+	}
+
+
 
 	public String getNombreProcedimiento() {
 		return nombreProcedimiento;
@@ -68,6 +84,14 @@ public class Procedimiento {
 		this.tipoParams = tipoParams;
 	}
 
+	public TamañoProcedimiento getTamaño() {
+		return tamaño;
+	}
+
+	public void setTamaño(TamañoProcedimiento tamaño) {
+		this.tamaño = tamaño;
+	}
+
 	/**
 	 * Metodo para crear la tabla de variables del procedimiento actual
 	 */
@@ -94,6 +118,16 @@ public class Procedimiento {
 	 */
 	public int getCantidadParametros() {
 		return this.tipoParams.size();
+	}
+	
+	/**
+	 * Metodo para guardar la informacion referente al tamano del procedimiento
+	 */
+	public void llenaTamañoVar(){
+		// guardar el tamano de las variables en el mapa
+		for (Variable actual: this.variables.values()){
+			this.tamaño.setTamañoVar(actual.getTipoVariable());
+		}
 	}
 	
 }
