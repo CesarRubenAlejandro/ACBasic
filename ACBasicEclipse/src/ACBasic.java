@@ -78,6 +78,10 @@ public class ACBasic implements ACBasicConstants {
         System.out.println("Error: Expresion no es booleana:" + detail);
         System.exit(0);
         break;
+      case 7:
+        System.out.println("Error: Argumentos no coinciden en:" + detail);
+        System.exit(0);
+        break;
 
     }
   }
@@ -1072,6 +1076,7 @@ public class ACBasic implements ACBasicConstants {
 
         } else {
           // ERROR LLAMADA
+          errorHandler(7,nombreProc);
         }
   }
 
@@ -1234,9 +1239,22 @@ public class ACBasic implements ACBasicConstants {
         matrizCuadruplos[falso][3] = contadorCuadruplo;
   }
 
-  static final public void llam() throws ParseException {
+  static final public void llam(String nombreProc) throws ParseException {
+ ArrayList<Integer > argumentosParam; ArrayList<Integer > tiposParam;
     jj_consume_token(PARIZQ);
+            // generar cuadruplo ERA
+                matrizCuadruplos[contadorCuadruplo][0] = Codigos.ERA;
+                matrizCuadruplos[contadorCuadruplo][1] = Codigos.NULO;
+                matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
+                matrizCuadruplos[contadorCuadruplo][3] = dirProcedimientos.getProcedimientos().get(nombreProc).getIdentificadorProcedimiento();
+                contadorCuadruplo++;
+                // inicializar listas
+                tiposParam = new ArrayList<Integer >();
+                argumentosParam = new ArrayList<Integer >();
     exp();
+                // guardar la direccion del argumento y su tipo para su futura comparacion
+        argumentosParam.add( pilaOperandos.pop());
+        tiposParam.add( pilaTipos.pop());
     label_13:
     while (true) {
       switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
@@ -1249,8 +1267,33 @@ public class ACBasic implements ACBasicConstants {
       }
       jj_consume_token(COMA);
       exp();
+                // guardar la direccion del argumento y su tipo para su futura comparacion
+        argumentosParam.add( pilaOperandos.pop());
+        tiposParam.add( pilaTipos.pop());
     }
     jj_consume_token(PARDER);
+    // revisar que los tipos de la llamada coincidan con los parametros de la funcion
+
+        if(dirProcedimientos.getProcedimientos().get(nombreProc).comparaParams(tiposParam) ){
+                // generar cuadruplos de parametros
+                for (int i=0; i< argumentosParam.size(); i++){
+                        matrizCuadruplos[contadorCuadruplo][0] = Codigos.PARAM;
+                        matrizCuadruplos[contadorCuadruplo][1] = argumentosParam.get(i);
+                        matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
+                        matrizCuadruplos[contadorCuadruplo][3] = i;
+                        contadorCuadruplo++;
+                }
+                // generar cuadruplo de GOSUB
+                matrizCuadruplos[contadorCuadruplo][0] = Codigos.GOSUB;
+                matrizCuadruplos[contadorCuadruplo][1] = Codigos.NULO;
+                matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
+                matrizCuadruplos[contadorCuadruplo][3] = dirProcedimientos.getProcedimientos().get(nombreProc).getIdentificadorProcedimiento();
+                contadorCuadruplo++;
+
+        } else {
+          // ERROR LLAMADA
+          errorHandler(7,nombreProc);
+        }
     jj_consume_token(PYC);
   }
 
@@ -1281,7 +1324,7 @@ public class ACBasic implements ACBasicConstants {
     id = jj_consume_token(ID);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case PARIZQ:
-      llam();
+      llam(id.toString());
       break;
     case CORIZQ:
     case IGUAL:

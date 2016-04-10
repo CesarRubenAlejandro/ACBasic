@@ -88,6 +88,10 @@ public class ACBasic
       	System.out.println("Error: Expresion no es booleana:" + detail);
       	System.exit(0);
       	break;
+      case 7:
+      	System.out.println("Error: Argumentos no coinciden en:" + detail);
+      	System.exit(0);
+      	break;
 
     }
   }
@@ -750,7 +754,8 @@ void fact5(String nombreProc):
 		matrizCuadruplos[contadorCuadruplo][3] = dirProcedimientos.getProcedimientos().get(nombreProc).getIdentificadorProcedimiento();
 		contadorCuadruplo++;
 			} else {
-	  // ERROR LLAMADA	}
+	  // ERROR LLAMADA
+	  errorHandler(7,nombreProc);	}
 	      }
 }
 
@@ -882,10 +887,57 @@ void cycle():
 	matrizCuadruplos[falso][3] = contadorCuadruplo;  }
 }
 
-void llam():
-{}
+void llam(String nombreProc):
+{ArrayList<Integer > argumentosParam; ArrayList<Integer > tiposParam;}
 {
-   <PARIZQ > exp() (< COMA > exp())* < PARDER > <PYC >
+   <PARIZQ >
+	{
+	    // generar cuadruplo ERA
+		matrizCuadruplos[contadorCuadruplo][0] = Codigos.ERA;
+		matrizCuadruplos[contadorCuadruplo][1] = Codigos.NULO;
+		matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
+		matrizCuadruplos[contadorCuadruplo][3] = dirProcedimientos.getProcedimientos().get(nombreProc).getIdentificadorProcedimiento();
+		contadorCuadruplo++;
+		// inicializar listas
+		tiposParam = new ArrayList<Integer >();
+		argumentosParam = new ArrayList<Integer >();
+  	}
+    exp()
+    {
+		// guardar la direccion del argumento y su tipo para su futura comparacion
+    	argumentosParam.add( pilaOperandos.pop());
+    	tiposParam.add( pilaTipos.pop());
+  	} (< COMA > exp()
+	{
+		// guardar la direccion del argumento y su tipo para su futura comparacion
+    	argumentosParam.add( pilaOperandos.pop());
+    	tiposParam.add( pilaTipos.pop());
+  	}
+  	)* < PARDER > {
+    // revisar que los tipos de la llamada coincidan con los parametros de la funcion
+
+	if(dirProcedimientos.getProcedimientos().get(nombreProc).comparaParams(tiposParam) ){
+		// generar cuadruplos de parametros
+		for (int i=0; i< argumentosParam.size(); i++){
+			matrizCuadruplos[contadorCuadruplo][0] = Codigos.PARAM;
+			matrizCuadruplos[contadorCuadruplo][1] = argumentosParam.get(i);
+			matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
+			matrizCuadruplos[contadorCuadruplo][3] = i;
+			contadorCuadruplo++;
+		}
+		// generar cuadruplo de GOSUB
+		matrizCuadruplos[contadorCuadruplo][0] = Codigos.GOSUB;
+		matrizCuadruplos[contadorCuadruplo][1] = Codigos.NULO;
+		matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
+		matrizCuadruplos[contadorCuadruplo][3] = dirProcedimientos.getProcedimientos().get(nombreProc).getIdentificadorProcedimiento();
+		contadorCuadruplo++;
+		
+	} else {
+	  // ERROR LLAMADA
+	  errorHandler(7,nombreProc);
+	}
+	    
+  } <PYC >
 }
 
 void main():
@@ -914,7 +966,7 @@ void main():
 void assignllam():
 {Token id;}
 {
-  id = < ID > (llam()
+  id = < ID > (llam(id.toString())
   | {
    // buscar que exista el id
    Variable varActual = dirProcedimientos.obtenerVariable(procedimientoActual, id.toString()); 
