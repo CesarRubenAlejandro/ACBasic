@@ -82,6 +82,18 @@ public class ACBasic implements ACBasicConstants {
         System.out.println("Error: Argumentos no coinciden en:" + detail);
         System.exit(0);
         break;
+      case 8:
+        System.out.println("Error: Procedimiento void con valor de retorno tipo:" + detail);
+        System.exit(0);
+        break;
+      case 9:
+        System.out.println("Error: Procedimiento no void sin valor de retorno en:" + detail);
+        System.exit(0);
+        break;
+      case 10:
+        System.out.println("Error: Procedimiento con incorrecto tipo de retorno en:" + detail);
+        System.exit(0);
+        break;
 
     }
   }
@@ -424,7 +436,7 @@ public class ACBasic implements ACBasicConstants {
     jj_consume_token(PARDER);
    // guardar el cuadruplo inicial del procedimiento
         dirProcedimientos.getProcedimientos().get(procedimientoActual).setCuadruploInicial(contadorCuadruplo);
-    body();
+    body(tipoFuncion);
    // borrar tabla de variables para el procedimiento actual
    dirProcedimientos.getProcedimientos().get(procedimientoActual).setVariables(null);
    // generar cuadruplo retorno
@@ -514,7 +526,8 @@ public class ACBasic implements ACBasicConstants {
      }
   }
 
-  static final public void body() throws ParseException {
+  static final public void body(int tipoFuncion) throws ParseException {
+ boolean existeRetorno = false;
     jj_consume_token(LLAIZQ);
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case VAR:
@@ -543,7 +556,32 @@ public class ACBasic implements ACBasicConstants {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case RETURN:
       jj_consume_token(RETURN);
+    // prender bandera
+    existeRetorno = true;
+    // revisar que funcion no sea tipo VOID
+        if (tipoFuncion == Codigos.VOID)
+        {
+          // ERROR
+          errorHandler(8, "");
+        }
       exp();
+    //revisar si el tipo de retorno coincide coincide con el tipo de funcion
+        int valorRetorno = pilaOperandos.pop();
+        int tipoRetorno = pilaTipos.pop();
+        // revisar que los tipos coincidan
+        if (tipoRetorno != tipoFuncion)
+        {
+          // ERROR 
+          errorHandler(10, ""+tipoRetorno);
+        } else {
+          // generar cuadruplo RETURN
+
+                matrizCuadruplos[contadorCuadruplo][0] = Codigos.RETURN;
+                matrizCuadruplos[contadorCuadruplo][1] = Codigos.NULO;
+                matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
+                matrizCuadruplos[contadorCuadruplo][3] = valorRetorno;
+                contadorCuadruplo++;
+        }
       jj_consume_token(PYC);
       break;
     default:
@@ -551,6 +589,14 @@ public class ACBasic implements ACBasicConstants {
       ;
     }
     jj_consume_token(LLADER);
+    // revisar que si la funcion no es void, se haya hecho un return
+
+        if (tipoFuncion != Codigos.VOID && tipoFuncion != Codigos.MAIN) {
+          if (!existeRetorno) {
+                // ERROR
+        errorHandler(9, "");
+          }
+    }
   }
 
   static final public void body1() throws ParseException {
@@ -1074,6 +1120,26 @@ public class ACBasic implements ACBasicConstants {
                 matrizCuadruplos[contadorCuadruplo][3] = dirProcedimientos.getProcedimientos().get(nombreProc).getIdentificadorProcedimiento();
                 contadorCuadruplo++;
 
+                // obtener el tipo de la funcion llamada para generar cuadruplo de asignacion si no es void
+
+                int tipoFuncLlamada = dirProcedimientos.getProcedimientos().get(nombreProc).getTipoProcedimiento();
+                if (tipoFuncLlamada != Codigos.VOID) {
+                  // generar cuadruplo de asignacion
+                  matrizCuadruplos[contadorCuadruplo][0] = Codigos.ASSIGN;
+                  matrizCuadruplos[contadorCuadruplo][1] = dirProcedimientos.getProcedimientos().get(nombreProc).getIdentificadorProcedimiento();
+                  matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
+                  matrizCuadruplos[contadorCuadruplo][3] = ManejadorMemoria.getMemoriaTemporal(tipoFuncLlamada);
+                  contadorCuadruplo++;
+
+                  // agregar al tamaño de procedimiento un temporal
+                  dirProcedimientos.getProcedimientos().get(procedimientoActual).getTamaño().setTamañoTemp(tipoFuncLlamada);
+
+                  // meter a pila de operadores y operandos los valores recien calculados
+                  pilaOperandos.push(matrizCuadruplos[contadorCuadruplo-1][3]);
+                  pilaTipos.push(tipoFuncLlamada);
+
+                }
+
         } else {
           // ERROR LLAMADA
           errorHandler(7,nombreProc);
@@ -1316,7 +1382,7 @@ public class ACBasic implements ACBasicConstants {
     dirProcedimientos.agregarProcedimiento(mainProc);
     jj_consume_token(PARIZQ);
     jj_consume_token(PARDER);
-    body();
+    body(Codigos.MAIN);
   }
 
   static final public void assignllam() throws ParseException {
