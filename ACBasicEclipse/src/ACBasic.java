@@ -1081,25 +1081,40 @@ public class ACBasic implements ACBasicConstants {
         // inicializar listas
         tiposParam = new ArrayList<Integer >();
         argumentosParam = new ArrayList<Integer >();
-    exp();
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case TRUE:
+    case FALSE:
+    case PARIZQ:
+    case NEGACION:
+    case ID:
+    case CTEI:
+    case CTEF:
+    case CTESTR:
+    case CTECHAR:
+      exp();
         // guardar la direccion del argumento y su tipo para su futura comparacion
     argumentosParam.add( pilaOperandos.pop());
     tiposParam.add( pilaTipos.pop());
-    label_11:
-    while (true) {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case COMA:
-        ;
-        break;
-      default:
-        jj_la1[35] = jj_gen;
-        break label_11;
-      }
-      jj_consume_token(COMA);
-      exp();
+      label_11:
+      while (true) {
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case COMA:
+          ;
+          break;
+        default:
+          jj_la1[35] = jj_gen;
+          break label_11;
+        }
+        jj_consume_token(COMA);
+        exp();
                 // guardar la direccion del argumento y su tipo para su futura comparacion
         argumentosParam.add( pilaOperandos.pop());
         tiposParam.add( pilaTipos.pop());
+      }
+      break;
+    default:
+      jj_la1[36] = jj_gen;
+      ;
     }
     jj_consume_token(PARDER);
     // revisar que los tipos de la llamada coincidan con los parametros de la funcion
@@ -1172,7 +1187,7 @@ public class ACBasic implements ACBasicConstants {
         ;
         break;
       default:
-        jj_la1[36] = jj_gen;
+        jj_la1[37] = jj_gen;
         break label_12;
       }
       jj_consume_token(ELIF);
@@ -1216,7 +1231,7 @@ public class ACBasic implements ACBasicConstants {
       minibody();
       break;
     default:
-      jj_la1[37] = jj_gen;
+      jj_la1[38] = jj_gen;
       ;
     }
     while (!pilaSaltos.isEmpty())
@@ -1253,7 +1268,7 @@ public class ACBasic implements ACBasicConstants {
       jj_consume_token(CORDER);
       break;
     default:
-      jj_la1[38] = jj_gen;
+      jj_la1[39] = jj_gen;
       ;
     }
     jj_consume_token(PARDER);
@@ -1317,25 +1332,40 @@ public class ACBasic implements ACBasicConstants {
                 // inicializar listas
                 tiposParam = new ArrayList<Integer >();
                 argumentosParam = new ArrayList<Integer >();
-    exp();
-                // guardar la direccion del argumento y su tipo para su futura comparacion
-        argumentosParam.add( pilaOperandos.pop());
-        tiposParam.add( pilaTipos.pop());
-    label_13:
-    while (true) {
-      switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
-      case COMA:
-        ;
-        break;
-      default:
-        jj_la1[39] = jj_gen;
-        break label_13;
-      }
-      jj_consume_token(COMA);
+    switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+    case TRUE:
+    case FALSE:
+    case PARIZQ:
+    case NEGACION:
+    case ID:
+    case CTEI:
+    case CTEF:
+    case CTESTR:
+    case CTECHAR:
       exp();
                 // guardar la direccion del argumento y su tipo para su futura comparacion
         argumentosParam.add( pilaOperandos.pop());
         tiposParam.add( pilaTipos.pop());
+      label_13:
+      while (true) {
+        switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
+        case COMA:
+          ;
+          break;
+        default:
+          jj_la1[40] = jj_gen;
+          break label_13;
+        }
+        jj_consume_token(COMA);
+        exp();
+                // guardar la direccion del argumento y su tipo para su futura comparacion
+        argumentosParam.add( pilaOperandos.pop());
+        tiposParam.add( pilaTipos.pop());
+      }
+      break;
+    default:
+      jj_la1[41] = jj_gen;
+      ;
     }
     jj_consume_token(PARDER);
     // revisar que los tipos de la llamada coincidan con los parametros de la funcion
@@ -1407,7 +1437,7 @@ public class ACBasic implements ACBasicConstants {
       assign();
       break;
     default:
-      jj_la1[40] = jj_gen;
+      jj_la1[42] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
     }
@@ -1423,7 +1453,7 @@ public class ACBasic implements ACBasicConstants {
   static public Token jj_nt;
   static private int jj_ntk;
   static private int jj_gen;
-  static final private int[] jj_la1 = new int[41];
+  static final private int[] jj_la1 = new int[43];
   static private int[] jj_la1_0;
   static private int[] jj_la1_1;
   static {
@@ -1431,10 +1461,10 @@ public class ACBasic implements ACBasicConstants {
       jj_la1_init_1();
    }
    private static void jj_la1_init_0() {
-      jj_la1_0 = new int[] {0x40,0x80,0x7c00,0x180000,0x8000000,0xfc00,0xfc00,0x0,0x8000000,0x0,0x0,0x7e00,0x8000000,0x7c00,0x1000000,0x40,0x270000,0x2000000,0x270000,0x270000,0x2000000,0x270000,0x40000000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x180000,0x40000000,0x40000000,0x8000000,0x400000,0x800000,0x40000000,0x8000000,0x40000000,};
+      jj_la1_0 = new int[] {0x40,0x80,0x7c00,0x180000,0x8000000,0xfc00,0xfc00,0x0,0x8000000,0x0,0x0,0x7e00,0x8000000,0x7c00,0x1000000,0x40,0x270000,0x2000000,0x270000,0x270000,0x2000000,0x270000,0x40000000,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x180000,0x40000000,0x40000000,0x8000000,0x180000,0x400000,0x800000,0x40000000,0x8000000,0x180000,0x40000000,};
    }
    private static void jj_la1_init_1() {
-      jj_la1_1 = new int[] {0x0,0x0,0x0,0x1e0000,0x0,0x0,0x0,0x1,0x0,0x1,0x1,0x0,0x0,0x0,0x0,0x0,0x10000,0x0,0x10000,0x10000,0x0,0x10000,0x0,0xc00,0xc00,0x1f8,0x1f8,0x3000,0x3000,0xc000,0xc000,0x200,0x1f0002,0x2,0x2,0x0,0x0,0x0,0x0,0x0,0x3,};
+      jj_la1_1 = new int[] {0x0,0x0,0x0,0x1e0000,0x0,0x0,0x0,0x1,0x0,0x1,0x1,0x0,0x0,0x0,0x0,0x0,0x10000,0x0,0x10000,0x10000,0x0,0x10000,0x0,0xc00,0xc00,0x1f8,0x1f8,0x3000,0x3000,0xc000,0xc000,0x200,0x1f0002,0x2,0x2,0x0,0x1f0202,0x0,0x0,0x0,0x0,0x1f0202,0x3,};
    }
 
   /** Constructor with InputStream. */
@@ -1455,7 +1485,7 @@ public class ACBasic implements ACBasicConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 41; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 43; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -1469,7 +1499,7 @@ public class ACBasic implements ACBasicConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 41; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 43; i++) jj_la1[i] = -1;
   }
 
   /** Constructor. */
@@ -1486,7 +1516,7 @@ public class ACBasic implements ACBasicConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 41; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 43; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -1496,7 +1526,7 @@ public class ACBasic implements ACBasicConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 41; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 43; i++) jj_la1[i] = -1;
   }
 
   /** Constructor with generated Token Manager. */
@@ -1512,7 +1542,7 @@ public class ACBasic implements ACBasicConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 41; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 43; i++) jj_la1[i] = -1;
   }
 
   /** Reinitialise. */
@@ -1521,7 +1551,7 @@ public class ACBasic implements ACBasicConstants {
     token = new Token();
     jj_ntk = -1;
     jj_gen = 0;
-    for (int i = 0; i < 41; i++) jj_la1[i] = -1;
+    for (int i = 0; i < 43; i++) jj_la1[i] = -1;
   }
 
   static private Token jj_consume_token(int kind) throws ParseException {
@@ -1577,7 +1607,7 @@ public class ACBasic implements ACBasicConstants {
       la1tokens[jj_kind] = true;
       jj_kind = -1;
     }
-    for (int i = 0; i < 41; i++) {
+    for (int i = 0; i < 43; i++) {
       if (jj_la1[i] == jj_gen) {
         for (int j = 0; j < 32; j++) {
           if ((jj_la1_0[i] & (1<<j)) != 0) {

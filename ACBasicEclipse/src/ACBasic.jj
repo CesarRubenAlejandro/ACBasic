@@ -765,7 +765,7 @@ void fact5(String nombreProc):
 	contadorCuadruplo++;
 	// inicializar listas
 	tiposParam = new ArrayList<Integer >();
-	argumentosParam = new ArrayList<Integer >();  }  exp()
+	argumentosParam = new ArrayList<Integer >();  }  [exp()
   {	// guardar la direccion del argumento y su tipo para su futura comparacion
     argumentosParam.add( pilaOperandos.pop());
     tiposParam.add( pilaTipos.pop());  }
@@ -775,7 +775,7 @@ void fact5(String nombreProc):
     	argumentosParam.add( pilaOperandos.pop());
     	tiposParam.add( pilaTipos.pop());
   	}
-  )* < PARDER >  {
+  )*] < PARDER >  {
     // revisar que los tipos de la llamada coincidan con los parametros de la funcion
 
 	if(dirProcedimientos.getProcedimientos().get(nombreProc).comparaParams(tiposParam) ){
@@ -960,7 +960,7 @@ void llam(String nombreProc):
 		tiposParam = new ArrayList<Integer >();
 		argumentosParam = new ArrayList<Integer >();
   	}
-    exp()
+    [exp()
     {
 		// guardar la direccion del argumento y su tipo para su futura comparacion
     	argumentosParam.add( pilaOperandos.pop());
@@ -971,7 +971,7 @@ void llam(String nombreProc):
     	argumentosParam.add( pilaOperandos.pop());
     	tiposParam.add( pilaTipos.pop());
   	}
-  	)* < PARDER > {
+  	)*] < PARDER > {
     // revisar que los tipos de la llamada coincidan con los parametros de la funcion
 
 	if(dirProcedimientos.getProcedimientos().get(nombreProc).comparaParams(tiposParam) ){
