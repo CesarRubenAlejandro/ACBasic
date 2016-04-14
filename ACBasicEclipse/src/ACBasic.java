@@ -34,7 +34,7 @@ public class ACBasic implements ACBasicConstants {
      parser.prog();
      System.out.println("OK.");
      System.out.println("CUADRUPLOS:");
-     for (int i=0; i<20; i++) {
+     for (int i=0; i<contadorCuadruplo; i++) {
                  System.out.println(i + ": " + matrizCuadruplos[i][0] + " " + matrizCuadruplos[i][1] + " "
                  + matrizCuadruplos[i][2] + " " + matrizCuadruplos[i][3]);
      }
@@ -291,7 +291,7 @@ public class ACBasic implements ACBasicConstants {
     // asignar el tipo de scope de la variable
 
     String scopeVar = "local";
-    if (procedimientoActual.equals("program")) {
+    if (dirProcedimientos.getProcedimientos().get(procedimientoActual).getTipoProcedimiento() == Codigos.PROGRAM) {
           // unicamente si el procedimiento actual es de tipo program, el scope es global
       scopeVar = "global";
         }
@@ -523,6 +523,7 @@ public class ACBasic implements ACBasicConstants {
      } else {
        // guardar el tipo de parametro
        dirProcedimientos.getProcedimientos().get(procedimientoActual).getTipoParams().add(paramAux.getTipoVariable());
+       // GUARDAR LA DIRECCION VIRTUAL DEL PARAMETRO
      }
   }
 

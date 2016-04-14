@@ -20,6 +20,9 @@ public class Procedimiento {
 	private int cuadruploInicial;
 	// tipos de los parametros
 	private ArrayList <Integer> tipoParams;
+	
+	// DIRECCIONE(es) VIRTUAL(es) de los PARAMETROS
+	
 	// tamaño
 	private TamañoProcedimiento tamaño;
 	// identificador del procedimiento
