@@ -524,6 +524,7 @@ public class ACBasic implements ACBasicConstants {
        // guardar el tipo de parametro
        dirProcedimientos.getProcedimientos().get(procedimientoActual).getTipoParams().add(paramAux.getTipoVariable());
        // GUARDAR LA DIRECCION VIRTUAL DEL PARAMETRO
+       dirProcedimientos.getProcedimientos().get(procedimientoActual).getDireccionParametros().add(paramAux.getDireccionVariable());
      }
   }
 

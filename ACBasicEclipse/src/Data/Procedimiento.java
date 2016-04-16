@@ -21,7 +21,8 @@ public class Procedimiento {
 	// tipos de los parametros
 	private ArrayList <Integer> tipoParams;
 	
-	// DIRECCIONE(es) VIRTUAL(es) de los PARAMETROS
+	// DIRECCION(es) VIRTUAL(es) de los PARAMETROS
+	private ArrayList<Integer> direccionParametros;
 	
 	// tamaño
 	private TamañoProcedimiento tamaño;
@@ -33,13 +34,22 @@ public class Procedimiento {
 		super();
 		tipoParams = new ArrayList<Integer>();
 		tamaño = new TamañoProcedimiento();
+		direccionParametros = new ArrayList<Integer>();
 	}
+	
+	public ArrayList<Integer> getDireccionParametros() {
+		return direccionParametros;
+	}
+
+	public void setDireccionParametros(ArrayList<Integer> direccionParametros) {
+		this.direccionParametros = direccionParametros;
+	}
+
+
 
 	public int getIdentificadorProcedimiento() {
 		return identificadorProcedimiento;
 	}
-
-
 
 	public void setIdentificadorProcedimiento(int identificadorProcedimiento) {
 		this.identificadorProcedimiento = identificadorProcedimiento;
