@@ -25,7 +25,7 @@ public class Procedimiento {
 	private ArrayList<Integer> direccionParametros;
 	
 	// tamaño
-	private TamañoProcedimiento tamaño;
+	private TamanoProcedimiento tamano;
 	// identificador del procedimiento
 	private int identificadorProcedimiento;
 	
@@ -33,7 +33,7 @@ public class Procedimiento {
 	public Procedimiento() {
 		super();
 		tipoParams = new ArrayList<Integer>();
-		tamaño = new TamañoProcedimiento();
+		tamano = new TamanoProcedimiento();
 		direccionParametros = new ArrayList<Integer>();
 	}
 	
@@ -97,12 +97,12 @@ public class Procedimiento {
 		this.tipoParams = tipoParams;
 	}
 
-	public TamañoProcedimiento getTamaño() {
-		return tamaño;
+	public TamanoProcedimiento getTamano() {
+		return tamano;
 	}
 
-	public void setTamaño(TamañoProcedimiento tamaño) {
-		this.tamaño = tamaño;
+	public void setTamano(TamanoProcedimiento tamano) {
+		this.tamano = tamano;
 	}
 
 	/**
@@ -136,10 +136,10 @@ public class Procedimiento {
 	/**
 	 * Metodo para guardar la informacion referente al tamano del procedimiento
 	 */
-	public void llenaTamañoVar(){
+	public void llenaTamanoVar(){
 		// guardar el tamano de las variables en el mapa
 		for (Variable actual: this.variables.values()){
-			this.tamaño.setTamañoVar(actual.getTipoVariable());
+			this.tamano.setTamanoVar(actual.getTipoVariable());
 		}
 	}
 	

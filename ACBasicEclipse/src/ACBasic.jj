@@ -255,7 +255,7 @@ void vars():
   }
    vars1() < PYC > (vars1() < PYC >)*
    {
-     dirProcedimientos.getProcedimientos().get(procedimientoActual).llenaTamañoVar();   }
+     dirProcedimientos.getProcedimientos().get(procedimientoActual).llenaTamanoVar();   }
 }
 
 void vars1():
@@ -561,7 +561,7 @@ void exp():
 			  	pilaOperandos.push(direccionRes);
 			  	pilaTipos.push(tipoRes);
 			  	// agregar al tamaño de procedimiento un temporal
-			  	dirProcedimientos.getProcedimientos().get(procedimientoActual).getTamaño().setTamañoTemp(tipoRes);
+			  	dirProcedimientos.getProcedimientos().get(procedimientoActual).getTamano().setTamanoTemp(tipoRes);
 			} else {
 			  // ERROR
 			  errorHandler(5, tipo1 + " y " +tipo2);
@@ -610,7 +610,7 @@ void e1():
 			  	pilaOperandos.push(direccionRes);
 			  	pilaTipos.push(tipoRes);
 			  	// agregar al tamaño de procedimiento un temporal
-			  	dirProcedimientos.getProcedimientos().get(procedimientoActual).getTamaño().setTamañoTemp(tipoRes);
+			  	dirProcedimientos.getProcedimientos().get(procedimientoActual).getTamano().setTamanoTemp(tipoRes);
 			} else {
 			  // ERROR
 			  errorHandler(5, tipo1 + " y " +tipo2);
@@ -647,7 +647,7 @@ void e2():
 			  	pilaOperandos.push(direccionRes);
 			  	pilaTipos.push(tipoRes);
 			  	// agregar al tamaño de procedimiento un temporal
-			  	dirProcedimientos.getProcedimientos().get(procedimientoActual).getTamaño().setTamañoTemp(tipoRes);
+			  	dirProcedimientos.getProcedimientos().get(procedimientoActual).getTamano().setTamanoTemp(tipoRes);
 			} else {
 			  // ERROR
 			  errorHandler(5, tipo1 + " y " +tipo2);
@@ -688,7 +688,7 @@ void term():
 			  	pilaOperandos.push(direccionRes);
 			  	pilaTipos.push(tipoRes);
 			  	// agregar al tamaño de procedimiento un temporal
-			  	dirProcedimientos.getProcedimientos().get(procedimientoActual).getTamaño().setTamañoTemp(tipoRes);
+			  	dirProcedimientos.getProcedimientos().get(procedimientoActual).getTamano().setTamanoTemp(tipoRes);
 			} else {
 			  // ERROR
 			  errorHandler(5, tipo1 + " y " +tipo2);
@@ -807,7 +807,7 @@ void fact5(String nombreProc):
 		  contadorCuadruplo++;
 		  
 		  // agregar al tamaño de procedimiento un temporal
-		  dirProcedimientos.getProcedimientos().get(procedimientoActual).getTamaño().setTamañoTemp(tipoFuncLlamada);
+		  dirProcedimientos.getProcedimientos().get(procedimientoActual).getTamano().setTamanoTemp(tipoFuncLlamada);
 
 		  // meter a pila de operadores y operandos los valores recien calculados
 		  pilaOperandos.push(matrizCuadruplos[contadorCuadruplo-1][3]);

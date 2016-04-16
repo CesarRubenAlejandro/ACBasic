@@ -1,6 +1,6 @@
 package Data;
 
-public class TamañoProcedimiento {
+public class TamanoProcedimiento {
 
 	private int cantidadVarInt;
 	private int cantidadVarFloat;
@@ -14,7 +14,7 @@ public class TamañoProcedimiento {
 	private int cantidadTempString;
 	private int cantidadTempBool;
 	
-	public TamañoProcedimiento() {
+	public TamanoProcedimiento() {
 		super();
 		cantidadVarInt = 0;
 		cantidadVarFloat = 0;
@@ -108,7 +108,7 @@ public class TamañoProcedimiento {
 		this.cantidadTempBool = cantidadTempBool;
 	}
 	
-	public void setTamañoVar(int tipo) {
+	public void setTamanoVar(int tipo) {
 		switch (tipo) {
 			case Codigos.INT:
 				cantidadVarInt++;
@@ -128,7 +128,7 @@ public class TamañoProcedimiento {
 		}
 	}
 	
-	public void setTamañoTemp(int tipo) {
+	public void setTamanoTemp(int tipo) {
 		switch (tipo) {
 			case Codigos.INT:
 				cantidadTempInt++;

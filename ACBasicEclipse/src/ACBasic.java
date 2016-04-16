@@ -262,7 +262,7 @@ public class ACBasic implements ACBasicConstants {
       vars1();
       jj_consume_token(PYC);
     }
-     dirProcedimientos.getProcedimientos().get(procedimientoActual).llenaTamañoVar();
+     dirProcedimientos.getProcedimientos().get(procedimientoActual).llenaTamanoVar();
   }
 
   static final public void vars1() throws ParseException {
@@ -741,7 +741,7 @@ public class ACBasic implements ACBasicConstants {
                                 pilaOperandos.push(direccionRes);
                                 pilaTipos.push(tipoRes);
                                 // agregar al tamaño de procedimiento un temporal
-                                dirProcedimientos.getProcedimientos().get(procedimientoActual).getTamaño().setTamañoTemp(tipoRes);
+                                dirProcedimientos.getProcedimientos().get(procedimientoActual).getTamano().setTamanoTemp(tipoRes);
                         } else {
                           // ERROR
                           errorHandler(5, tipo1 + " y " +tipo2);
@@ -843,7 +843,7 @@ public class ACBasic implements ACBasicConstants {
                                 pilaOperandos.push(direccionRes);
                                 pilaTipos.push(tipoRes);
                                 // agregar al tamaño de procedimiento un temporal
-                                dirProcedimientos.getProcedimientos().get(procedimientoActual).getTamaño().setTamañoTemp(tipoRes);
+                                dirProcedimientos.getProcedimientos().get(procedimientoActual).getTamano().setTamanoTemp(tipoRes);
                         } else {
                           // ERROR
                           errorHandler(5, tipo1 + " y " +tipo2);
@@ -881,7 +881,7 @@ public class ACBasic implements ACBasicConstants {
                                 pilaOperandos.push(direccionRes);
                                 pilaTipos.push(tipoRes);
                                 // agregar al tamaño de procedimiento un temporal
-                                dirProcedimientos.getProcedimientos().get(procedimientoActual).getTamaño().setTamañoTemp(tipoRes);
+                                dirProcedimientos.getProcedimientos().get(procedimientoActual).getTamano().setTamanoTemp(tipoRes);
                         } else {
                           // ERROR
                           errorHandler(5, tipo1 + " y " +tipo2);
@@ -943,7 +943,7 @@ public class ACBasic implements ACBasicConstants {
                                 pilaOperandos.push(direccionRes);
                                 pilaTipos.push(tipoRes);
                                 // agregar al tamaño de procedimiento un temporal
-                                dirProcedimientos.getProcedimientos().get(procedimientoActual).getTamaño().setTamañoTemp(tipoRes);
+                                dirProcedimientos.getProcedimientos().get(procedimientoActual).getTamano().setTamanoTemp(tipoRes);
                         } else {
                           // ERROR
                           errorHandler(5, tipo1 + " y " +tipo2);
@@ -1149,7 +1149,7 @@ public class ACBasic implements ACBasicConstants {
                   contadorCuadruplo++;
 
                   // agregar al tamaño de procedimiento un temporal
-                  dirProcedimientos.getProcedimientos().get(procedimientoActual).getTamaño().setTamañoTemp(tipoFuncLlamada);
+                  dirProcedimientos.getProcedimientos().get(procedimientoActual).getTamano().setTamanoTemp(tipoFuncLlamada);
 
                   // meter a pila de operadores y operandos los valores recien calculados
                   pilaOperandos.push(matrizCuadruplos[contadorCuadruplo-1][3]);
