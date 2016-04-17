@@ -11,14 +11,14 @@ public class DirectorioProcedimientos {
 	// mapa que guarda todos los procedimientos. 
 	// la llave String es el id del procedimiento
 	private HashMap<String, Procedimiento> procedimientos;
-	// mapa que guarda las constantes, la llave es el valor de la constante en tipo String
-	private HashMap<String, Constante> constantes;
+	// mapa que guarda las constantes, la llave es la direccion de la constante
+	private HashMap<Integer, Constante> constantes;
 	private String nombrePrograma;
 
 	public DirectorioProcedimientos() {
 		super();
 		procedimientos = new HashMap<String, Procedimiento> ();
-		constantes = new HashMap<String, Constante> ();
+		constantes = new HashMap<Integer, Constante> ();
 	}
 
 	public String getNombrePrograma() {
@@ -43,11 +43,11 @@ public class DirectorioProcedimientos {
 	
 	
 	
-	public HashMap<String, Constante> getConstantes() {
+	public HashMap<Integer, Constante> getConstantes() {
 		return constantes;
 	}
 
-	public void setConstantes(HashMap<String, Constante> constantes) {
+	public void setConstantes(HashMap<Integer, Constante> constantes) {
 		this.constantes = constantes;
 	}
 
@@ -81,7 +81,12 @@ public class DirectorioProcedimientos {
 	 * @return
 	 */
 	public boolean existeConstante(String valorConstante){
-		return this.constantes.containsKey(valorConstante);
+		for (Integer key: this.constantes.keySet()){
+			if (this.constantes.get(key).getValorConstante().equals(valorConstante)){
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
