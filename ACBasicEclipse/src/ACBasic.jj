@@ -203,10 +203,12 @@ void prog() :
 		  errorHandler(1,idPrograma.toString());
 		}
    }
-   <PYC > [vars()]   {
+   <PYC > [vars()]
+   {
      // guardar la direccion donde se debe generar el cuadruplo GOTO main
 	direccionCuadruploMain = contadorCuadruplo;
-	contadorCuadruplo++;   } (func())* main()
+	contadorCuadruplo++;
+   } (func())* main()
 }
 
 int tipo():
@@ -232,10 +234,13 @@ Constante cte():
     // agregar la constante al directorio de procedimientos si esta no existe ya
     
     if(dirProcedimientos.existeConstante(valor.toString())) {
-      	return dirProcedimientos.getConstantes().get(valor.toString());    } else {
+      	return return dirProcedimientos.getConstantePorValor(valor.toString());
+    } else {
       	Constante auxiliar = new Constante(tipo, ManejadorMemoria.getMemoriaConstante(tipo) , valor.toString());
       	dirProcedimientos.getConstantes().put(auxiliar.getDireccionConstante(), auxiliar);
-      	return auxiliar;    }  }
+      	return auxiliar;
+    }
+  }
 }
 
 void defarr():
@@ -250,12 +255,14 @@ void vars():
   < VAR >
   {
     // crear tabla de variables para el procedimiento actual si no existe
-    if (dirProcedimientos.getProcedimientos().get(procedimientoActual).getVariables() == null){      dirProcedimientos.getProcedimientos().get(procedimientoActual).crearTablaDeVariables();
+    if (dirProcedimientos.getProcedimientos().get(procedimientoActual).getVariables() == null){
+      dirProcedimientos.getProcedimientos().get(procedimientoActual).crearTablaDeVariables();
     }
   }
    vars1() < PYC > (vars1() < PYC >)*
    {
-     dirProcedimientos.getProcedimientos().get(procedimientoActual).llenaTamanoVar();   }
+     dirProcedimientos.getProcedimientos().get(procedimientoActual).llenaTamanoVar();
+   }
 }
 
 void vars1():
@@ -297,7 +304,8 @@ void vars2():
 		} else {
 		  // ERROR
 		  errorHandler(5, tipoVariable + " y " + cons.getTipoConstante());
-		}	}
+		}
+	}
   ]
   (< COMA > nombreVariable=<ID >
 	{
@@ -394,9 +402,11 @@ void func():
    		procedimientoActual = nombreProc.toString();
 	}
  }
- <PARIZQ > param() < PARDER > {
+ <PARIZQ > param() < PARDER >
+ {
    // guardar el cuadruplo inicial del procedimiento
-   	dirProcedimientos.getProcedimientos().get(procedimientoActual).setCuadruploInicial(contadorCuadruplo); }
+   	dirProcedimientos.getProcedimientos().get(procedimientoActual).setCuadruploInicial(contadorCuadruplo);
+ }
   body(tipoFuncion)
  {
 
@@ -447,41 +457,55 @@ void param1():
        // guardar el tipo de parametro
        dirProcedimientos.getProcedimientos().get(procedimientoActual).getTipoParams().add(paramAux.getTipoVariable());
        // GUARDAR LA DIRECCION VIRTUAL DEL PARAMETRO
-       dirProcedimientos.getProcedimientos().get(procedimientoActual).getDireccionParametros().add(paramAux.getDireccionVariable());     }
+       dirProcedimientos.getProcedimientos().get(procedimientoActual).getDireccionParametros().add(paramAux.getDireccionVariable());
+     }
    } 
 }
 
 void body(int tipoFuncion):
 {boolean existeRetorno = false;}
 {
-  < LLAIZQ > [vars()] (body1())* [<RETURN >  {
+  < LLAIZQ > [vars()] (body1())* [<RETURN >
+  {
     // prender bandera
     existeRetorno = true;
     // revisar que funcion no sea tipo VOID
-	if (tipoFuncion == Codigos.VOID)	{
+	if (tipoFuncion == Codigos.VOID)
+	{
 	  // ERROR
-	  errorHandler(8, "");	}  }exp()  {
+	  errorHandler(8, "");
+	}
+  }exp()
+  {
     //revisar si el tipo de retorno coincide coincide con el tipo de funcion
 	int valorRetorno = pilaOperandos.pop();
 	int tipoRetorno = pilaTipos.pop();
 	// revisar que los tipos coincidan
-	if (tipoRetorno != tipoFuncion)	{
+	if (tipoRetorno != tipoFuncion)
+	{
 	  // ERROR 
-	  errorHandler(10, ""+tipoRetorno);	} else {
+	  errorHandler(10, ""+tipoRetorno);
+	} else {
 	  // generar cuadruplo RETURN
 
 	  	matrizCuadruplos[contadorCuadruplo][0] = Codigos.RETURN;
 	  	matrizCuadruplos[contadorCuadruplo][1] = Codigos.NULO;
 	  	matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
 	  	matrizCuadruplos[contadorCuadruplo][3] = valorRetorno;
-	  	contadorCuadruplo++;	}
-      } < PYC >] <LLADER >  {
+	  	contadorCuadruplo++;
+	}
+    
+  } < PYC >] <LLADER >
+  {
     // revisar que si la funcion no es void, se haya hecho un return
 
 	if (tipoFuncion != Codigos.VOID && tipoFuncion != Codigos.MAIN) {
 	  if (!existeRetorno) {
 	  	// ERROR
-      	errorHandler(9, "");  	  }    }  }
+      	errorHandler(9, "");  
+	  }
+    }
+  }
 }
 
 void body1():
@@ -713,7 +737,8 @@ void fact1():
   {
 	// meter a la pila de operandos la direccion de la constante y a la pila de tipos el tipo de la constante
     pilaOperandos.push(cons.getDireccionConstante());
-    pilaTipos.push(cons.getTipoConstante());  }
+    pilaTipos.push(cons.getTipoConstante());
+  }
 }
 
 void fact2():
@@ -758,7 +783,8 @@ void fact4():
 void fact5(String nombreProc):
 {ArrayList<Integer > argumentosParam; ArrayList<Integer > tiposParam;}
 {
-  < PARIZQ >  {
+  < PARIZQ >
+  {
     // generar cuadruplo ERA
 	matrizCuadruplos[contadorCuadruplo][0] = Codigos.ERA;
 	matrizCuadruplos[contadorCuadruplo][1] = Codigos.NULO;
@@ -767,22 +793,27 @@ void fact5(String nombreProc):
 	contadorCuadruplo++;
 	// inicializar listas
 	tiposParam = new ArrayList<Integer >();
-	argumentosParam = new ArrayList<Integer >();  }  [exp()
-  {	// guardar la direccion del argumento y su tipo para su futura comparacion
+	argumentosParam = new ArrayList<Integer >();
+  }  [exp()
+  {
+	// guardar la direccion del argumento y su tipo para su futura comparacion
     argumentosParam.add( pilaOperandos.pop());
-    tiposParam.add( pilaTipos.pop());  }
+    tiposParam.add( pilaTipos.pop());
+  }
   (< COMA > exp()
 	{
 		// guardar la direccion del argumento y su tipo para su futura comparacion
     	argumentosParam.add( pilaOperandos.pop());
     	tiposParam.add( pilaTipos.pop());
   	}
-  )*] < PARDER >  {
+  )*] < PARDER >
+  {
     // revisar que los tipos de la llamada coincidan con los parametros de la funcion
 
 	if(dirProcedimientos.getProcedimientos().get(nombreProc).comparaParams(tiposParam) ){
 		// generar cuadruplos de parametros
-		for (int i=0; i< argumentosParam.size(); i++){			matrizCuadruplos[contadorCuadruplo][0] = Codigos.PARAM;
+		for (int i=0; i< argumentosParam.size(); i++){
+			matrizCuadruplos[contadorCuadruplo][0] = Codigos.PARAM;
 			matrizCuadruplos[contadorCuadruplo][1] = argumentosParam.get(i);
 			matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
 			matrizCuadruplos[contadorCuadruplo][3] = i;
@@ -812,17 +843,22 @@ void fact5(String nombreProc):
 		  // meter a pila de operadores y operandos los valores recien calculados
 		  pilaOperandos.push(matrizCuadruplos[contadorCuadruplo-1][3]);
 		  pilaTipos.push(tipoFuncLlamada);
-		}
-			} else {
+
+		}
+		
+	} else {
 	  // ERROR LLAMADA
-	  errorHandler(7,nombreProc);	}
-	      }
+	  errorHandler(7,nombreProc);
+	}
+	    
+  }
 }
 
 void cond():
 {}
 {
-  < IF > <PARIZQ > exp() < PARDER >  {	int auxTipo = pilaTipos.pop();
+  < IF > <PARIZQ > exp() < PARDER >
+  {	int auxTipo = pilaTipos.pop();
     if (auxTipo != Codigos.BOOL){
 		// ERROR
 		errorHandler(6, "" + auxTipo);
@@ -845,7 +881,8 @@ void cond():
 	  contadorCuadruplo++;
 	  int falso = pilaSaltos.pop();
 	  matrizCuadruplos[falso][3] = contadorCuadruplo;
-	  pilaSaltos.push(contadorCuadruplo-1);	}
+	  pilaSaltos.push(contadorCuadruplo-1);
+	}
   <PARIZQ > exp() < PARDER >
 	{
 		auxTipo = pilaTipos.pop();
@@ -860,7 +897,8 @@ void cond():
 			matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
 			contadorCuadruplo++;
 			pilaSaltos.push(contadorCuadruplo-1);
-		  }  	}
+		  }  
+	}
   minibody())* [<ELSE >
 	{
 	  // generar cuadruplo goto
@@ -875,9 +913,12 @@ void cond():
   minibody()
   ]
   {
-    while (!pilaSaltos.isEmpty())    {		int fin = pilaSaltos.pop();
+    while (!pilaSaltos.isEmpty())
+    {
+		int fin = pilaSaltos.pop();
 		matrizCuadruplos[fin][3] = contadorCuadruplo;
-  	}       }
+  	}     
+  }
 }
 
 void write():
@@ -933,7 +974,9 @@ void cycle():
 	  matrizCuadruplos[contadorCuadruplo][1] = direccionRes;
       matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
 	  contadorCuadruplo++;
-	  pilaSaltos.push(contadorCuadruplo-1);  	}  }
+	  pilaSaltos.push(contadorCuadruplo-1);
+  	}
+  }
   minibody()
   {	int falso = pilaSaltos.pop();
    	int retorno = pilaSaltos.pop();
@@ -944,7 +987,8 @@ void cycle():
 	matrizCuadruplos[contadorCuadruplo][3] = retorno;
 	contadorCuadruplo++;
 	//rellenar falso con contador
-	matrizCuadruplos[falso][3] = contadorCuadruplo;  }
+	matrizCuadruplos[falso][3] = contadorCuadruplo;
+  }
 }
 
 void llam(String nombreProc):

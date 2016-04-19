@@ -1,4 +1,4 @@
-package Data;
+package itesm.mx.acbasic.Data;
 
 import java.util.HashMap;
 
@@ -11,7 +11,7 @@ public class DirectorioProcedimientos {
 	// mapa que guarda todos los procedimientos. 
 	// la llave String es el id del procedimiento
 	private HashMap<String, Procedimiento> procedimientos;
-	// mapa que guarda las constantes, la llave es la direccion de la constante
+	// mapa que guarda las constantes, la llave es el valor de la constante en tipo String
 	private HashMap<Integer, Constante> constantes;
 	private String nombrePrograma;
 
@@ -40,9 +40,9 @@ public class DirectorioProcedimientos {
 	public void setProcedimientos(HashMap<String, Procedimiento> procedimientos) {
 		this.procedimientos = procedimientos;
 	}
-	
-	
-	
+
+
+
 	public HashMap<Integer, Constante> getConstantes() {
 		return constantes;
 	}
@@ -74,7 +74,7 @@ public class DirectorioProcedimientos {
 		return this.procedimientos.get(nombreProcActual).getVariables().containsKey(nombreVariable) ||
 				this.procedimientos.get("program").getVariables().containsKey(nombreVariable);
 	}
-	
+
 	/**
 	 * Metodo para revisar si existe la constante ya declarada en el directorio de procedimientos
 	 * @param valorConstante
@@ -87,6 +87,15 @@ public class DirectorioProcedimientos {
 			}
 		}
 		return false;
+	}
+
+	public Constante getConstantePorValor(String valorConstante){
+		for (Integer key: this.constantes.keySet()){
+			if (this.constantes.get(key).getValorConstante().equals(valorConstante)){
+				return this.constantes.get(key);
+			}
+		}
+		return null;
 	}
 
 	/**
