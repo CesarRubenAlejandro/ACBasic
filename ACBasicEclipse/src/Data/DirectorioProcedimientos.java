@@ -1,4 +1,4 @@
-package itesm.mx.acbasic.Data;
+package Data;
 
 import java.util.HashMap;
 
