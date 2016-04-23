@@ -983,6 +983,8 @@ public class ACBasic implements ACBasicConstants {
     switch ((jj_ntk==-1)?jj_ntk():jj_ntk) {
     case NEGACION:
       jj_consume_token(NEGACION);
+    // agregar el NOT a la pila de operadores
+    pilaOperadores.push(Codigos.NOT);
       break;
     default:
       jj_la1[31] = jj_gen;
@@ -1007,6 +1009,29 @@ public class ACBasic implements ACBasicConstants {
       jj_la1[32] = jj_gen;
       jj_consume_token(-1);
       throw new ParseException();
+    }
+    // si el tope de la pila de operadores es NOT, generar cuadruplo
+
+    if (!pilaOperadores.isEmpty()){
+      if (pilaOperadores.peek()==Codigos.NOT) {
+        int operador = pilaOperadores.pop();
+                int operando = pilaOperandos.pop();
+                int tipo = pilaTipos.pop();
+                if (tipo == Codigos.BOOL) {
+                  // generar cuadruplo
+                        matrizCuadruplos[contadorCuadruplo][0] = operador;
+                        matrizCuadruplos[contadorCuadruplo][1] = operando;
+                        matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
+                        int direccionRes = ManejadorMemoria.getMemoriaTemporal(tipo);
+                        matrizCuadruplos[contadorCuadruplo][3] = direccionRes;
+                        contadorCuadruplo++;
+                        //guardar resultado en pila operandos
+                        pilaOperandos.push(direccionRes);
+                        pilaTipos.push(tipo);
+                        // agregar al tamaño de procedimiento un temporal
+                        dirProcedimientos.getProcedimientos().get(procedimientoActual).getTamano().setTamanoTemp(tipo);
+                }
+      }
     }
   }
 
