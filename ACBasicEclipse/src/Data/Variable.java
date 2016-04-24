@@ -19,6 +19,7 @@ public class Variable {
 	
 	public Variable() {
 		super();
+		this.sizeVariable = 0;
 	}
 
 	public Variable(String nombreVariable, int tipoVariable, String scope) {

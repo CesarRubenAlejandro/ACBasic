@@ -387,27 +387,16 @@ void vars3():
 {int tipoArreglo; Token nombreArreglo; Token size;}
 {
   < ARRAY >
-  {
-    // crear objeto variable
-    Variable auxArreglo = new Variable();
-  }
   tipoArreglo = tipo()
-  {
-    // guardar el tipo de variable
-    auxArreglo.setTipoVariable(tipoArreglo);
-  }
   nombreArreglo = < ID >
   {
-    // guardar el nombre de la variable
-    auxArreglo.setNombreVariable(nombreArreglo.toString());
-
     // definir el scope de la variable
     String scope = "local";
-    if(procedimientoActual.equals("program")){
+    if(dirProcedimientos.getProcedimientos().get(procedimientoActual).getTipoProcedimiento() == Codigos.PROGRAM){
       // unicamente si el procedimiento actual es program, el scope de la variable es global
       scope = "global";
     }
-    auxArreglo.setScope(scope);
+    Variable auxArreglo = new Variable(nombreArreglo.toString(),tipoArreglo, scope);
   }
   
    <CORIZQ >
@@ -423,7 +412,8 @@ void vars3():
     if(!dirProcedimientos.getProcedimientos().get(procedimientoActual).agregarVariable(auxArreglo)){
 	  // si ya existe una variable con ese nombre, reportar error
       errorHandler(2,nombreArreglo.toString());
-    }   }
+    }
+    System.out.println(auxArreglo.getNombreVariable() + " " + auxArreglo.getSizeVariable());   }
     <CORDER > [<IGUAL > defarr(auxArreglo)]
 }
 
@@ -583,10 +573,28 @@ void minibody1():
   assignllam() | cond() | read() | write() | cycle()
 }
 
-void assign():
+void assign(Variable varArreglo):
 {}
 {
-  [<CORIZQ > exp() < CORDER >] <IGUAL >
+  [<CORIZQ > exp() {
+    int tipoIndex = pilaTipos.pop();
+    int valorIndex = pilaOperandos.pop();
+
+    if(tipoIndex != Codigos.INT){
+		//Error
+		errorHandler(12,varArreglo.getNombreVariable());
+    } else {
+		// generar cuadruplo VERIFICA
+		matrizCuadruplos[contadorCuadruplo][0] = Codigos.VERIFICAR;
+		matrizCuadruplos[contadorCuadruplo][1] = valorIndex;
+		matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
+		matrizCuadruplos[contadorCuadruplo][3] = varArreglo.getSizeVariable();
+		contadorCuadruplo++;
+		//Guardar arreglo en PilaOperadores
+		pilaOperadores.push(varArreglo.getDireccionVariable()+valorIndex);
+		pilaTipos.push(varArreglo.getTipoVariable());
+	}
+  }< CORDER >] <IGUAL >
   {
     // meter operador de asignacion a operadores
     pilaOperadores.push(Codigos.ASSIGN);
@@ -866,7 +874,6 @@ void fact4(String id):
   < CORIZQ > exp()  {
     int tipoIndex = pilaTipos.pop();
     int valorIndex = pilaOperandos.pop();
-
     if(tipoIndex != Codigos.INT){		//Error
 		errorHandler(12,id);
     } else {
@@ -876,9 +883,11 @@ void fact4(String id):
 		matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
 		matrizCuadruplos[contadorCuadruplo][3] = arreglo.getSizeVariable();
 		contadorCuadruplo++;
+		
 		//Guardar arreglo en PilaOperadores
 		pilaOperadores.push(arreglo.getDireccionVariable()+valorIndex);
 		pilaTipos.push(arreglo.getTipoVariable());
+		System.out.println( arreglo.getDireccionVariable());
 	}  }
   < CORDER >
 }
@@ -1177,19 +1186,21 @@ void main():
 }
 
 void assignllam():
-{Token id;}
+{Token id; Variable varActual;}
 {
-  id = < ID > (llam(id.toString())
-  | {
-   // buscar que exista el id
-   Variable varActual = dirProcedimientos.obtenerVariable(procedimientoActual, id.toString()); 
-   if ( varActual == null) {
-     // ERROR
-     errorHandler(4, id.toString());
-   } else {
-     // meter direccion y tipo a las pilas
-     pilaOperandos.push(varActual.getDireccionVariable());
-     pilaTipos.push(varActual.getTipoVariable());
-   } 
- } assign())
+  id = < ID >
+  ( llam(id.toString())|
+  {
+	   // buscar que exista el id
+	   varActual = dirProcedimientos.obtenerVariable(procedimientoActual, id.toString()); 
+	   if ( varActual == null) {
+	     // ERROR
+	     errorHandler(4, id.toString());
+	   } else {
+	     if (varActual.getSizeVariable() == 0 ){
+	     	// meter direccion y tipo a las pilas si no es un arreglo
+		     pilaOperandos.push(varActual.getDireccionVariable());
+		     pilaTipos.push(varActual.getTipoVariable());  	     }
+	   } 
+ } assign(varActual))
 }
