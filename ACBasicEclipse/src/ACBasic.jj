@@ -104,7 +104,22 @@ public class ACBasic
       	System.out.println("Error: Procedimiento con incorrecto tipo de retorno en:" + detail);
       	System.exit(0);
       	break;
-
+	  case 11:
+      	System.out.println("Error: Tamaño del procedimiento imposible:" + detail);
+      	System.exit(0);
+      	break;
+	  case 12:
+      	System.out.println("Error: Index del arreglo no es entero:" + detail);
+      	System.exit(0);
+      	break;
+      case 13:
+      	System.out.println("Error: Constante de tipo diferente al arreglo:" + detail);
+      	System.exit(0);
+      	break;
+      case 14:
+      	System.out.println("Error: Tamaño incorrecto en la declaracion del arreglo:" + detail);
+      	System.exit(0);
+      	break;
     }
   }
   
@@ -243,10 +258,44 @@ Constante cte():
   }
 }
 
-void defarr():
-{}
+void defarr(Variable arreglo):
+{Constante auxCte; }
 {
-  < CORIZQ > cte() (< COMA > cte())* < CORDER >
+   {
+     //Lista para guardar los valores de cada casilla del arreglo
+     ArrayList < Constante > auxListaCte = new ArrayList < Constante > ();     } 
+  < CORIZQ > auxCte = cte()
+  {
+    if(auxCte.getTipoConstante() == arreglo.getTipoVariable()){
+      //guardar valor
+      auxListaCte.add(auxCte);
+    } else {
+     //ERROR
+     errorHandler(13,arreglo.getNombreVariable());
+    }    }
+   (< COMA > auxCte = cte()
+	{
+		if(auxCte.getTipoConstante() == arreglo.getTipoVariable()){
+	      //guardar valor
+	      auxListaCte.add(auxCte);
+	    } else {
+	     //ERROR
+	     errorHandler(13,arreglo.getNombreVariable());
+	    } 
+	}
+   )* < CORDER >
+   {
+     if(auxListaCte.size() != arreglo.getSizeVariable())     {
+       //ERROR
+       errorHandler(14,arreglo.getNombreVariable());
+     } else     {
+       for (int i = 0; i < arreglo.getSizeVariable(); i++){
+        //generar cuadruplo
+	  	matrizCuadruplos[contadorCuadruplo][0] = Codigos.ASSIGN;
+	  	matrizCuadruplos[contadorCuadruplo][1] = auxListaCte.get(i).getDireccionConstante();
+	  	matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
+	  	matrizCuadruplos[contadorCuadruplo][3] = arreglo.getDireccionVariable() + i;
+	  	contadorCuadruplo++;       }     }   }
 }
 
 void vars():
@@ -335,7 +384,7 @@ void vars2():
 }
 
 void vars3():
-{int tipoArreglo; Token nombreArreglo;}
+{int tipoArreglo; Token nombreArreglo; Token size;}
 {
   < ARRAY >
   {
@@ -359,15 +408,23 @@ void vars3():
       scope = "global";
     }
     auxArreglo.setScope(scope);
+  }
+  
+   <CORIZQ >
+   size = <CTEI >
+   {
+     //Revisar size mayor a 0
+     if(Integer.parseInt(size.toString()) > 0) {
+     	auxArreglo.setSizeVariable(Integer.parseInt(size.toString()));   	 } else {
+   	   //Error
+   	   errorHandler(11,nombreArreglo.toString());   	 }
 
-	// dar de alta la variable en el directorio de variables del procedimiento actual
+   	 // dar de alta la variable en el directorio de variables del procedimiento actual
     if(!dirProcedimientos.getProcedimientos().get(procedimientoActual).agregarVariable(auxArreglo)){
 	  // si ya existe una variable con ese nombre, reportar error
       errorHandler(2,nombreArreglo.toString());
-    }
-  }
-  
-   <CORIZQ > <CTEI > <CORDER > [<IGUAL > defarr()]
+    }   }
+    <CORDER > [<IGUAL > defarr(auxArreglo)]
 }
 
 
@@ -786,9 +843,12 @@ void fact3():
    // buscar que exista el id
    Variable varActual = dirProcedimientos.obtenerVariable(procedimientoActual, id.toString());
    if ( varActual != null) {
-     // meter direccion y tipo a las pilas
-     pilaOperandos.push(varActual.getDireccionVariable());
-     pilaTipos.push(varActual.getTipoVariable());
+     //revisar que la variable no sea un arreglo
+     if(varActual.getSizeVariable() == 0){
+	     // meter direccion y tipo a las pilas
+	     pilaOperandos.push(varActual.getDireccionVariable());
+	     pilaTipos.push(varActual.getTipoVariable());
+   	 }
    } else {
      // revisar si el id es un metodo
       if (!dirProcedimientos.getProcedimientos().containsKey(id.toString())) {
@@ -797,13 +857,30 @@ void fact3():
       }
    }
    
- } [(fact4() | fact5(id.toString()))] 
+ } [(fact4(id.toString()) | fact5(id.toString()))] 
 }
 
-void fact4():
+void fact4(String id):
 {}
 {
-  < CORIZQ > exp() < CORDER >
+  < CORIZQ > exp()  {
+    int tipoIndex = pilaTipos.pop();
+    int valorIndex = pilaOperandos.pop();
+
+    if(tipoIndex != Codigos.INT){		//Error
+		errorHandler(12,id);
+    } else {
+      	Variable arreglo = dirProcedimientos.obtenerVariable(procedimientoActual, id.toString());		// generar cuadruplo VERIFICA
+		matrizCuadruplos[contadorCuadruplo][0] = Codigos.VERIFICAR;
+		matrizCuadruplos[contadorCuadruplo][1] = valorIndex;
+		matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
+		matrizCuadruplos[contadorCuadruplo][3] = arreglo.getSizeVariable();
+		contadorCuadruplo++;
+		//Guardar arreglo en PilaOperadores
+		pilaOperadores.push(arreglo.getDireccionVariable()+valorIndex);
+		pilaTipos.push(arreglo.getTipoVariable());
+	}  }
+  < CORDER >
 }
 
 void fact5(String nombreProc):

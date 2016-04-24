@@ -55,4 +55,6 @@ public class Codigos {
 	public static final int RETURN = 17;
 	public static final int ASSIGNRET = 18;
 	
+	public static final int VERIFICAR = 19;
+	
 }

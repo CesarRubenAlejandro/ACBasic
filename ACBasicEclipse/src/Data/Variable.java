@@ -14,6 +14,8 @@ public class Variable {
 	private String scope;
 	//define la direccion logico 
 	private int direccionVariable;
+	//tamaño si es un arreglo
+	private int sizeVariable;
 	
 	public Variable() {
 		super();
@@ -29,6 +31,7 @@ public class Variable {
 		} else {
 			this.direccionVariable = ManejadorMemoria.getMemoria(tipoVariable);
 		}
+		this.sizeVariable = 0;
 	}
 	
 	public String getNombreVariable() {
@@ -58,5 +61,13 @@ public class Variable {
 	public void setDireccionVariable(int direccionVariable) {
 		this.direccionVariable = direccionVariable;
 	}
-	
+
+	public int getSizeVariable() {
+		return sizeVariable;
+	}
+
+	public void setSizeVariable(int sizeVariable) {
+		this.sizeVariable = sizeVariable;
+	}
+
 }
