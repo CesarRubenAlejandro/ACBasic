@@ -53,5 +53,6 @@ public class Codigos {
 	public static final int PARAM = 15;
 	public static final int GOSUB = 16;
 	public static final int RETURN = 17;
+	public static final int ASSIGNRET = 18;
 	
 }

@@ -1063,6 +1063,7 @@ public class ACBasic implements ACBasicConstants {
      pilaOperandos.push(varActual.getDireccionVariable());
      pilaTipos.push(varActual.getTipoVariable());
    } else {
+     // revisar si el id es un metodo
       if (!dirProcedimientos.getProcedimientos().containsKey(id.toString())) {
                 // ERROR
                 errorHandler(4,id.toString());
@@ -1099,6 +1100,9 @@ public class ACBasic implements ACBasicConstants {
   static final public void fact5(String nombreProc) throws ParseException {
  ArrayList<Integer > argumentosParam; ArrayList<Integer > tiposParam;
     jj_consume_token(PARIZQ);
+        // agregar fondo falso
+        pilaOperadores.push(Codigos.FONDOFALSO);
+
     // generar cuadruplo ERA
         matrizCuadruplos[contadorCuadruplo][0] = Codigos.ERA;
         matrizCuadruplos[contadorCuadruplo][1] = Codigos.NULO;
@@ -1144,6 +1148,9 @@ public class ACBasic implements ACBasicConstants {
       ;
     }
     jj_consume_token(PARDER);
+        // quitar fondo falso
+        pilaOperadores.pop();
+
     // revisar que los tipos de la llamada coincidan con los parametros de la funcion
 
         if(dirProcedimientos.getProcedimientos().get(nombreProc).comparaParams(tiposParam) ){
@@ -1166,8 +1173,8 @@ public class ACBasic implements ACBasicConstants {
 
                 int tipoFuncLlamada = dirProcedimientos.getProcedimientos().get(nombreProc).getTipoProcedimiento();
                 if (tipoFuncLlamada != Codigos.VOID) {
-                  // generar cuadruplo de asignacion
-                  matrizCuadruplos[contadorCuadruplo][0] = Codigos.ASSIGN;
+                  // generar cuadruplo de asignacion especial si la funcion llamada no es void
+                  matrizCuadruplos[contadorCuadruplo][0] = Codigos.ASSIGNRET;
                   matrizCuadruplos[contadorCuadruplo][1] = dirProcedimientos.getProcedimientos().get(nombreProc).getIdentificadorProcedimiento();
                   matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
                   matrizCuadruplos[contadorCuadruplo][3] = ManejadorMemoria.getMemoriaTemporal(tipoFuncLlamada);
