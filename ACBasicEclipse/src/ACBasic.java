@@ -746,8 +746,15 @@ public class ACBasic implements ACBasicConstants {
                 matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
                 matrizCuadruplos[contadorCuadruplo][3] = varArreglo.getSizeVariable();
                 contadorCuadruplo++;
-                //Guardar arreglo en PilaOperadores
-                pilaOperadores.push(varArreglo.getDireccionVariable()+valorIndex);
+        // GENERAR CUADRUPLO DE SUMA OFFSET + DIRBASE
+                int direccionResArr = ManejadorMemoria.getMemoriaTemporal(varArreglo.getTipoVariable());
+                matrizCuadruplos[contadorCuadruplo][0] = Codigos.SUMAOFFSET;
+                matrizCuadruplos[contadorCuadruplo][1] = valorIndex;
+                matrizCuadruplos[contadorCuadruplo][2] = varArreglo.getDireccionVariable();
+                matrizCuadruplos[contadorCuadruplo][3] = direccionResArr;
+                contadorCuadruplo++;
+        // GUARDAR LA DIRECCION INDIRECTA COMO NUMERO NEGATIVO
+                pilaOperandos.push(direccionResArr *  -1);
                 pilaTipos.push(varArreglo.getTipoVariable());
         }
       jj_consume_token(CORDER);
@@ -1168,18 +1175,23 @@ public class ACBasic implements ACBasicConstants {
                 //Error
                 errorHandler(12,id);
     } else {
-        Variable arreglo = dirProcedimientos.obtenerVariable(procedimientoActual, id.toString());
+        Variable varArreglo = dirProcedimientos.obtenerVariable(procedimientoActual, id.toString());
                 // generar cuadruplo VERIFICA
                 matrizCuadruplos[contadorCuadruplo][0] = Codigos.VERIFICAR;
                 matrizCuadruplos[contadorCuadruplo][1] = valorIndex;
                 matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
-                matrizCuadruplos[contadorCuadruplo][3] = arreglo.getSizeVariable();
+                matrizCuadruplos[contadorCuadruplo][3] = varArreglo.getSizeVariable();
                 contadorCuadruplo++;
-
-                //Guardar arreglo en PilaOperadores
-                pilaOperadores.push(arreglo.getDireccionVariable()+valorIndex);
-                pilaTipos.push(arreglo.getTipoVariable());
-                System.out.println( arreglo.getDireccionVariable());
+        // GENERAR CUADRUPLO DE SUMA OFFSET + DIRBASE
+                int direccionResArr = ManejadorMemoria.getMemoriaTemporal(varArreglo.getTipoVariable());
+                matrizCuadruplos[contadorCuadruplo][0] = Codigos.SUMAOFFSET;
+                matrizCuadruplos[contadorCuadruplo][1] = valorIndex;
+                matrizCuadruplos[contadorCuadruplo][2] = varArreglo.getDireccionVariable();
+                matrizCuadruplos[contadorCuadruplo][3] = direccionResArr;
+                contadorCuadruplo++;
+        // GUARDAR LA DIRECCION INDIRECTA COMO NUMERO NEGATIVO
+                pilaOperandos.push(direccionResArr *  -1);
+                pilaTipos.push(varArreglo.getTipoVariable());
         }
     jj_consume_token(CORDER);
   }

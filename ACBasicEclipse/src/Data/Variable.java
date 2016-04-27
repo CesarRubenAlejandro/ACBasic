@@ -69,6 +69,8 @@ public class Variable {
 
 	public void setSizeVariable(int sizeVariable) {
 		this.sizeVariable = sizeVariable;
+		// reservar memoria para las cada casilla del arreglo
+		ManejadorMemoria.separaMemoriaArreglo(this.tipoVariable, this.sizeVariable, this.direccionVariable);
 	}
 
 }

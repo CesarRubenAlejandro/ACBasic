@@ -56,5 +56,6 @@ public class Codigos {
 	public static final int ASSIGNRET = 18;
 	
 	public static final int VERIFICAR = 19;
+	public static final int SUMAOFFSET = 20;
 	
 }

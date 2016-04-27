@@ -263,7 +263,8 @@ void defarr(Variable arreglo):
 {
    {
      //Lista para guardar los valores de cada casilla del arreglo
-     ArrayList < Constante > auxListaCte = new ArrayList < Constante > ();     } 
+     ArrayList < Constante > auxListaCte = new ArrayList < Constante > ();  
+   } 
   < CORIZQ > auxCte = cte()
   {
     if(auxCte.getTipoConstante() == arreglo.getTipoVariable()){
@@ -272,7 +273,8 @@ void defarr(Variable arreglo):
     } else {
      //ERROR
      errorHandler(13,arreglo.getNombreVariable());
-    }    }
+    }    
+}
    (< COMA > auxCte = cte()
 	{
 		if(auxCte.getTipoConstante() == arreglo.getTipoVariable()){
@@ -285,17 +287,22 @@ void defarr(Variable arreglo):
 	}
    )* < CORDER >
    {
-     if(auxListaCte.size() != arreglo.getSizeVariable())     {
+     if(auxListaCte.size() != arreglo.getSizeVariable())
+     {
        //ERROR
        errorHandler(14,arreglo.getNombreVariable());
-     } else     {
+     } else
+     {
        for (int i = 0; i < arreglo.getSizeVariable(); i++){
         //generar cuadruplo
 	  	matrizCuadruplos[contadorCuadruplo][0] = Codigos.ASSIGN;
 	  	matrizCuadruplos[contadorCuadruplo][1] = auxListaCte.get(i).getDireccionConstante();
 	  	matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
 	  	matrizCuadruplos[contadorCuadruplo][3] = arreglo.getDireccionVariable() + i;
-	  	contadorCuadruplo++;       }     }   }
+	  	contadorCuadruplo++;
+       }
+     }
+   }
 }
 
 void vars():
@@ -404,16 +411,19 @@ void vars3():
    {
      //Revisar size mayor a 0
      if(Integer.parseInt(size.toString()) > 0) {
-     	auxArreglo.setSizeVariable(Integer.parseInt(size.toString()));   	 } else {
+     	auxArreglo.setSizeVariable(Integer.parseInt(size.toString()));
+   	 } else {
    	   //Error
-   	   errorHandler(11,nombreArreglo.toString());   	 }
+   	   errorHandler(11,nombreArreglo.toString());
+   	 }
 
    	 // dar de alta la variable en el directorio de variables del procedimiento actual
     if(!dirProcedimientos.getProcedimientos().get(procedimientoActual).agregarVariable(auxArreglo)){
 	  // si ya existe una variable con ese nombre, reportar error
       errorHandler(2,nombreArreglo.toString());
     }
-    System.out.println(auxArreglo.getNombreVariable() + " " + auxArreglo.getSizeVariable());   }
+    System.out.println(auxArreglo.getNombreVariable() + " " + auxArreglo.getSizeVariable());
+   }
     <CORDER > [<IGUAL > defarr(auxArreglo)]
 }
 
@@ -590,8 +600,15 @@ void assign(Variable varArreglo):
 		matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
 		matrizCuadruplos[contadorCuadruplo][3] = varArreglo.getSizeVariable();
 		contadorCuadruplo++;
-		//Guardar arreglo en PilaOperadores
-		pilaOperadores.push(varArreglo.getDireccionVariable()+valorIndex);
+    	// GENERAR CUADRUPLO DE SUMA OFFSET + DIRBASE
+		int direccionResArr = ManejadorMemoria.getMemoriaTemporal(varArreglo.getTipoVariable());
+		matrizCuadruplos[contadorCuadruplo][0] = Codigos.SUMAOFFSET;
+		matrizCuadruplos[contadorCuadruplo][1] = valorIndex;
+		matrizCuadruplos[contadorCuadruplo][2] = varArreglo.getDireccionVariable();
+		matrizCuadruplos[contadorCuadruplo][3] = direccionResArr;
+		contadorCuadruplo++;
+    	// GUARDAR LA DIRECCION INDIRECTA COMO NUMERO NEGATIVO
+		pilaOperandos.push(direccionResArr *  -1);
 		pilaTipos.push(varArreglo.getTipoVariable());
 	}
   }< CORDER >] <IGUAL >
@@ -792,7 +809,8 @@ void term():
 void fact():
 {}
 {
-  [<NEGACION >  {
+  [<NEGACION >
+  {
     // agregar el NOT a la pila de operadores
     pilaOperadores.push(Codigos.NOT);
   }] (fact1() | fact2() | fact3())
@@ -816,8 +834,12 @@ void fact():
 		  	pilaOperandos.push(direccionRes);
 		  	pilaTipos.push(tipo);
 		  	// agregar al tamaño de procedimiento un temporal
-		  	dirProcedimientos.getProcedimientos().get(procedimientoActual).getTamano().setTamanoTemp(tipo);		}      }
-    }        }
+		  	dirProcedimientos.getProcedimientos().get(procedimientoActual).getTamano().setTamanoTemp(tipo);
+		}
+      }
+    }
+      
+  }
 }
 
 void fact1():
@@ -871,24 +893,33 @@ void fact3():
 void fact4(String id):
 {}
 {
-  < CORIZQ > exp()  {
+  < CORIZQ > exp()
+  {
     int tipoIndex = pilaTipos.pop();
     int valorIndex = pilaOperandos.pop();
-    if(tipoIndex != Codigos.INT){		//Error
+    if(tipoIndex != Codigos.INT){
+		//Error
 		errorHandler(12,id);
     } else {
-      	Variable arreglo = dirProcedimientos.obtenerVariable(procedimientoActual, id.toString());		// generar cuadruplo VERIFICA
+      	Variable varArreglo = dirProcedimientos.obtenerVariable(procedimientoActual, id.toString());
+		// generar cuadruplo VERIFICA
 		matrizCuadruplos[contadorCuadruplo][0] = Codigos.VERIFICAR;
 		matrizCuadruplos[contadorCuadruplo][1] = valorIndex;
 		matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
-		matrizCuadruplos[contadorCuadruplo][3] = arreglo.getSizeVariable();
+		matrizCuadruplos[contadorCuadruplo][3] = varArreglo.getSizeVariable();
 		contadorCuadruplo++;
-		
-		//Guardar arreglo en PilaOperadores
-		pilaOperadores.push(arreglo.getDireccionVariable()+valorIndex);
-		pilaTipos.push(arreglo.getTipoVariable());
-		System.out.println( arreglo.getDireccionVariable());
-	}  }
+    	// GENERAR CUADRUPLO DE SUMA OFFSET + DIRBASE
+		int direccionResArr = ManejadorMemoria.getMemoriaTemporal(varArreglo.getTipoVariable());
+		matrizCuadruplos[contadorCuadruplo][0] = Codigos.SUMAOFFSET;
+		matrizCuadruplos[contadorCuadruplo][1] = valorIndex;
+		matrizCuadruplos[contadorCuadruplo][2] = varArreglo.getDireccionVariable();
+		matrizCuadruplos[contadorCuadruplo][3] = direccionResArr;
+		contadorCuadruplo++;
+    	// GUARDAR LA DIRECCION INDIRECTA COMO NUMERO NEGATIVO
+		pilaOperandos.push(direccionResArr *  -1);
+		pilaTipos.push(varArreglo.getTipoVariable());
+	}
+  }
   < CORDER >
 }
 
@@ -1200,7 +1231,8 @@ void assignllam():
 	     if (varActual.getSizeVariable() == 0 ){
 	     	// meter direccion y tipo a las pilas si no es un arreglo
 		     pilaOperandos.push(varActual.getDireccionVariable());
-		     pilaTipos.push(varActual.getTipoVariable());  	     }
+		     pilaTipos.push(varActual.getTipoVariable());  
+	     }
 	   } 
  } assign(varActual))
 }
