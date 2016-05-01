@@ -1303,7 +1303,10 @@ public class ACBasic implements ACBasicConstants {
     jj_consume_token(PARIZQ);
     exp();
     jj_consume_token(PARDER);
-        int auxTipo = pilaTipos.pop();
+        // agregar a pila de saltos fondo falso para delimitar esta condicion
+        pilaSaltos.push(Codigos.FONDOFALSOIF);
+
+    int auxTipo = pilaTipos.pop();
     if (auxTipo != Codigos.BOOL){
                 // ERROR
                 errorHandler(6, "" + auxTipo);
@@ -1371,11 +1374,12 @@ public class ACBasic implements ACBasicConstants {
       jj_la1[38] = jj_gen;
       ;
     }
-    while (!pilaSaltos.isEmpty())
+    while (pilaSaltos.peek() != Codigos.FONDOFALSOIF)
     {
                 int fin = pilaSaltos.pop();
                 matrizCuadruplos[fin][3] = contadorCuadruplo;
         }
+        pilaSaltos.pop();
   }
 
   static final public void write() throws ParseException {

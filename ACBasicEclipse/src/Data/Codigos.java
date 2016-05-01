@@ -3,6 +3,7 @@ package Data;
 public class Codigos {
 	
 	public static final int ERROR = -1;
+	public static final int FONDOFALSOIF = -2;
 	
 	// codigos para tipos de variables
 	public static final int INT = 0;
