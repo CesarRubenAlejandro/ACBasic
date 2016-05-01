@@ -42,7 +42,7 @@ public class ACBasic
     try
     {
      parser.prog();
-     System.out.println("OK.");
+     System.out.println("OK.");         
      System.out.println("CUADRUPLOS:");
      for (int i=0; i<contadorCuadruplo; i++) {
 		 System.out.println(i + ": " + matrizCuadruplos[i][0] + " " + matrizCuadruplos[i][1] + " "
@@ -181,8 +181,8 @@ TOKEN: { < POR : "*" > }
 TOKEN: { < ENTRE : "/" > }
 
 TOKEN: { < ID : < LETTER >(("_")? (< LETTER >|< DIGIT >))* > }
-TOKEN: { < CTEI : ("-")? (<DIGIT>)+> }
-TOKEN: { < CTEF : ("-")? (<DIGIT>)+ "." (<DIGIT>)+ > }
+TOKEN: { < CTEI : ("-")?(<DIGIT>)+> }
+TOKEN: { < CTEF : ("-")?(<DIGIT>)+ "." (<DIGIT>)+ > }
 TOKEN: { < CTESTR : "\"" (< DIGIT >|< LETTER >| < CARACTER >)* "\"" > }
 TOKEN: { < CTECHAR : "'" (< DIGIT >|< LETTER >| < CARACTER >)? "'" > }
 
@@ -422,7 +422,6 @@ void vars3():
 	  // si ya existe una variable con ese nombre, reportar error
       errorHandler(2,nombreArreglo.toString());
     }
-    System.out.println(auxArreglo.getNombreVariable() + " " + auxArreglo.getSizeVariable());
    }
     <CORDER > [<IGUAL > defarr(auxArreglo)]
 }
@@ -501,8 +500,13 @@ void param1():
     if(dirProcedimientos.getProcedimientos().get(procedimientoActual).getVariables()==null){
      dirProcedimientos.getProcedimientos().get(procedimientoActual).crearTablaDeVariables();
 	}
+	// definir el primer parametro como NO por referencia (POR VALOR)
+	dirProcedimientos.getProcedimientos().get(procedimientoActual).getIndicadorPorReferencia().add(false);
   }
-   [< AMP >] nombreParam = <ID >
+   [< AMP >   {
+     // si lee un &, definir el parametro actual como POR REFERENCIA
+     int size = dirProcedimientos.getProcedimientos().get(procedimientoActual).getIndicadorPorReferencia().size();
+    dirProcedimientos.getProcedimientos().get(procedimientoActual).getIndicadorPorReferencia().set(size-1, true);    }] nombreParam = <ID >
    {
      // crear objeto variable y guardar el tipo y scope
     Variable paramAux = new Variable(nombreParam.toString(), tipoParam, "local");
@@ -1076,6 +1080,7 @@ void write():
   < PRINT > <PARIZQ > exp()
   {
     int resultado = pilaOperandos.pop();
+    // POP PILA TIPOS
     // generar cuadruplo de print
     matrizCuadruplos[contadorCuadruplo][0] = Codigos.PRINT;
   	matrizCuadruplos[contadorCuadruplo][1] = Codigos.NULO;
@@ -1087,22 +1092,58 @@ void write():
 }
 
 void read():
-{Token id;}
+{Token id; Boolean arregloLeido = false;}
 {
-  < READ > <PARIZQ > id=<ID > [<CORIZQ > exp() < CORDER >] < PARDER >
+  < READ > <PARIZQ > id=<ID > [<CORIZQ >  {
+    arregloLeido = true;  } exp() < CORDER >
+ {
+    int tipoIndex = pilaTipos.pop();
+    int valorIndex = pilaOperandos.pop();
+    if(tipoIndex != Codigos.INT){
+		//Error
+		errorHandler(12,id.toString());
+    } else {
+      	Variable varArreglo = dirProcedimientos.obtenerVariable(procedimientoActual, id.toString());
+		// generar cuadruplo VERIFICA
+		matrizCuadruplos[contadorCuadruplo][0] = Codigos.VERIFICAR;
+		matrizCuadruplos[contadorCuadruplo][1] = valorIndex;
+		matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
+		matrizCuadruplos[contadorCuadruplo][3] = varArreglo.getSizeVariable();
+		contadorCuadruplo++;
+    	// GENERAR CUADRUPLO DE SUMA OFFSET + DIRBASE
+		int direccionResArr = ManejadorMemoria.getMemoriaTemporal(varArreglo.getTipoVariable());
+		matrizCuadruplos[contadorCuadruplo][0] = Codigos.SUMAOFFSET;
+		matrizCuadruplos[contadorCuadruplo][1] = valorIndex;
+		matrizCuadruplos[contadorCuadruplo][2] = varArreglo.getDireccionVariable();
+		matrizCuadruplos[contadorCuadruplo][3] = direccionResArr;
+		contadorCuadruplo++;
+
+		// generar cuadruplo de read
+		
+	    matrizCuadruplos[contadorCuadruplo][0] = Codigos.READ;
+	  	matrizCuadruplos[contadorCuadruplo][1] = Codigos.NULO;
+	  	matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
+	  	matrizCuadruplos[contadorCuadruplo][3] = direccionResArr *  -1;
+	  	contadorCuadruplo++;
+	}
+    
+  }
+  ] < PARDER >
   {
-    // buscar que exista el id
-   Variable varActual = dirProcedimientos.obtenerVariable(procedimientoActual, id.toString()); 
-   if ( varActual == null) {
-     // ERROR
-     errorHandler(4, id.toString());
-   } else {
-      // generar cuadruplo de print 
-      matrizCuadruplos[contadorCuadruplo][0] = Codigos.READ;
-      matrizCuadruplos[contadorCuadruplo][1] = Codigos.NULO;
-      matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
-      matrizCuadruplos[contadorCuadruplo][3] = varActual.getDireccionVariable();
-      contadorCuadruplo++;
+    if (!arregloLeido)  {
+	    // buscar que exista el id
+	   Variable varActual = dirProcedimientos.obtenerVariable(procedimientoActual, id.toString()); 
+	   if ( varActual == null) {
+	     // ERROR
+	     errorHandler(4, id.toString());
+	   } else {
+	      // generar cuadruplo de read 
+	      matrizCuadruplos[contadorCuadruplo][0] = Codigos.READ;
+	      matrizCuadruplos[contadorCuadruplo][1] = Codigos.NULO;
+	      matrizCuadruplos[contadorCuadruplo][2] = Codigos.NULO;
+	      matrizCuadruplos[contadorCuadruplo][3] = varActual.getDireccionVariable();
+	      contadorCuadruplo++;
+	   }
    } 
   } <PYC >
 }
@@ -1178,6 +1219,9 @@ void llam(String nombreProc):
 			matrizCuadruplos[contadorCuadruplo][3] = i;
 			contadorCuadruplo++;
 		}
+		// agregar al procedimiento llamado las direcciones de los argumentos para usarlos si alguno es por referencia
+		dirProcedimientos.getProcedimientos().get(nombreProc).getFilaDireccionesLlamada().add(argumentosParam);
+		
 		// generar cuadruplo de GOSUB
 		matrizCuadruplos[contadorCuadruplo][0] = Codigos.GOSUB;
 		matrizCuadruplos[contadorCuadruplo][1] = Codigos.NULO;

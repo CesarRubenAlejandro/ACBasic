@@ -2,6 +2,8 @@ package Data;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Queue;
 
 /**
  * Clase que representa un procedimiento (func) del lenguaje ACBasic
@@ -23,7 +25,10 @@ public class Procedimiento {
 	
 	// DIRECCION(es) VIRTUAL(es) de los PARAMETROS
 	private ArrayList<Integer> direccionParametros;
-	
+	// indicadores para saber si algun parametro es por referencia
+	private ArrayList<Boolean> indicadorPorReferencia;
+	// fila de listas de direcciones de todas las llamadas hechas a la funcion
+	private Queue<ArrayList<Integer>> filaDireccionesLlamada;
 	// tamaño
 	private TamanoProcedimiento tamano;
 	// identificador del procedimiento
@@ -35,8 +40,36 @@ public class Procedimiento {
 		tipoParams = new ArrayList<Integer>();
 		tamano = new TamanoProcedimiento();
 		direccionParametros = new ArrayList<Integer>();
+		indicadorPorReferencia = new ArrayList<Boolean>();
+		filaDireccionesLlamada = new LinkedList<ArrayList<Integer>>();
 	}
 	
+	
+	
+	public Queue<ArrayList<Integer>> getFilaDireccionesLlamada() {
+		return filaDireccionesLlamada;
+	}
+
+
+
+	public void setFilaDireccionesLlamada(Queue<ArrayList<Integer>> filaDireccionesLlamada) {
+		this.filaDireccionesLlamada = filaDireccionesLlamada;
+	}
+
+
+
+	public ArrayList<Boolean> getIndicadorPorReferencia() {
+		return indicadorPorReferencia;
+	}
+
+
+
+	public void setIndicadorPorReferencia(ArrayList<Boolean> indicadorPorReferencia) {
+		this.indicadorPorReferencia = indicadorPorReferencia;
+	}
+
+
+
 	public ArrayList<Integer> getDireccionParametros() {
 		return direccionParametros;
 	}
