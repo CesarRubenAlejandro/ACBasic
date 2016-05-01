@@ -212,6 +212,7 @@ void prog() :
 		Procedimiento programProc = new Procedimiento();
 		programProc.setNombreProcedimiento(idPrograma.toString());
 		programProc.setTipoProcedimiento(Codigos.PROGRAM);
+		programProc.setIdentificadorProcedimiento(-1);
 		// guardar el procedimiento program en el directorio de procedimientos
 		if (!dirProcedimientos.agregarProcedimiento(programProc)) {
 		  // si ya existe un procedimiento con ese nombre, reportar error
@@ -316,9 +317,6 @@ void vars():
     }
   }
    vars1() < PYC > (vars1() < PYC >)*
-   {
-     dirProcedimientos.getProcedimientos().get(procedimientoActual).llenaTamanoVar();
-   }
 }
 
 void vars1():
@@ -503,10 +501,12 @@ void param1():
 	// definir el primer parametro como NO por referencia (POR VALOR)
 	dirProcedimientos.getProcedimientos().get(procedimientoActual).getIndicadorPorReferencia().add(false);
   }
-   [< AMP >   {
+   [< AMP >
+   {
      // si lee un &, definir el parametro actual como POR REFERENCIA
      int size = dirProcedimientos.getProcedimientos().get(procedimientoActual).getIndicadorPorReferencia().size();
-    dirProcedimientos.getProcedimientos().get(procedimientoActual).getIndicadorPorReferencia().set(size-1, true);    }] nombreParam = <ID >
+    dirProcedimientos.getProcedimientos().get(procedimientoActual).getIndicadorPorReferencia().set(size-1, true); 
+   }] nombreParam = <ID >
    {
      // crear objeto variable y guardar el tipo y scope
     Variable paramAux = new Variable(nombreParam.toString(), tipoParam, "local");
@@ -670,8 +670,7 @@ void exp():
 			  	//guardar resultado en pila operandos
 			  	pilaOperandos.push(direccionRes);
 			  	pilaTipos.push(tipoRes);
-			  	// agregar al tamaño de procedimiento un temporal
-			  	dirProcedimientos.getProcedimientos().get(procedimientoActual).getTamano().setTamanoTemp(tipoRes);
+			  	
 			} else {
 			  // ERROR
 			  errorHandler(5, tipo1 + " y " +tipo2);
@@ -719,8 +718,7 @@ void e1():
 			  	//guardar resultado en pila operandos
 			  	pilaOperandos.push(direccionRes);
 			  	pilaTipos.push(tipoRes);
-			  	// agregar al tamaño de procedimiento un temporal
-			  	dirProcedimientos.getProcedimientos().get(procedimientoActual).getTamano().setTamanoTemp(tipoRes);
+			  	
 			} else {
 			  // ERROR
 			  errorHandler(5, tipo1 + " y " +tipo2);
@@ -756,8 +754,7 @@ void e2():
 			  	//guardar resultado en pila operandos
 			  	pilaOperandos.push(direccionRes);
 			  	pilaTipos.push(tipoRes);
-			  	// agregar al tamaño de procedimiento un temporal
-			  	dirProcedimientos.getProcedimientos().get(procedimientoActual).getTamano().setTamanoTemp(tipoRes);
+			  	
 			} else {
 			  // ERROR
 			  errorHandler(5, tipo1 + " y " +tipo2);
@@ -797,8 +794,7 @@ void term():
 			  	//guardar resultado en pila operandos
 			  	pilaOperandos.push(direccionRes);
 			  	pilaTipos.push(tipoRes);
-			  	// agregar al tamaño de procedimiento un temporal
-			  	dirProcedimientos.getProcedimientos().get(procedimientoActual).getTamano().setTamanoTemp(tipoRes);
+			  	
 			} else {
 			  // ERROR
 			  errorHandler(5, tipo1 + " y " +tipo2);
@@ -837,8 +833,7 @@ void fact():
 		  	//guardar resultado en pila operandos
 		  	pilaOperandos.push(direccionRes);
 		  	pilaTipos.push(tipo);
-		  	// agregar al tamaño de procedimiento un temporal
-		  	dirProcedimientos.getProcedimientos().get(procedimientoActual).getTamano().setTamanoTemp(tipo);
+		  	
 		}
       }
     }
@@ -972,6 +967,9 @@ void fact5(String nombreProc):
 			matrizCuadruplos[contadorCuadruplo][3] = i;
 			contadorCuadruplo++;
 		}
+    // agregar al procedimiento llamado las direcciones de los argumentos para usarlos si alguno es por referencia
+    dirProcedimientos.getProcedimientos().get(nombreProc).getFilaDireccionesLlamada().add(argumentosParam);
+    
 		// generar cuadruplo de GOSUB
 		matrizCuadruplos[contadorCuadruplo][0] = Codigos.GOSUB;
 		matrizCuadruplos[contadorCuadruplo][1] = Codigos.NULO;
@@ -990,9 +988,7 @@ void fact5(String nombreProc):
 		  matrizCuadruplos[contadorCuadruplo][3] = ManejadorMemoria.getMemoriaTemporal(tipoFuncLlamada);
 		  contadorCuadruplo++;
 		  
-		  // agregar al tamaño de procedimiento un temporal
-		  dirProcedimientos.getProcedimientos().get(procedimientoActual).getTamano().setTamanoTemp(tipoFuncLlamada);
-
+		  
 		  // meter a pila de operadores y operandos los valores recien calculados
 		  pilaOperandos.push(matrizCuadruplos[contadorCuadruplo-1][3]);
 		  pilaTipos.push(tipoFuncLlamada);
@@ -1099,8 +1095,11 @@ void write():
 void read():
 {Token id; Boolean arregloLeido = false;}
 {
-  < READ > <PARIZQ > id=<ID > [<CORIZQ >  {
-    arregloLeido = true;  } exp() < CORDER >
+  < READ > <PARIZQ > id=<ID > [<CORIZQ >
+  {
+    arregloLeido = true;
+  }
+ exp() < CORDER >
  {
     int tipoIndex = pilaTipos.pop();
     int valorIndex = pilaOperandos.pop();
@@ -1259,6 +1258,7 @@ void main():
     Procedimiento mainProc = new Procedimiento();
 	mainProc.setNombreProcedimiento("main");
 	mainProc.setTipoProcedimiento(Codigos.MAIN);
+  mainProc.setIdentificadorProcedimiento(-2);
 
     // dar de alta el proc main en directorio de procedimientos
     dirProcedimientos.agregarProcedimiento(mainProc);

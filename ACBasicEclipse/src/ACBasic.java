@@ -126,6 +126,7 @@ public class ACBasic implements ACBasicConstants {
                 Procedimiento programProc = new Procedimiento();
                 programProc.setNombreProcedimiento(idPrograma.toString());
                 programProc.setTipoProcedimiento(Codigos.PROGRAM);
+                programProc.setIdentificadorProcedimiento(-1);
                 // guardar el procedimiento program en el directorio de procedimientos
                 if (!dirProcedimientos.agregarProcedimiento(programProc)) {
                   // si ya existe un procedimiento con ese nombre, reportar error
@@ -309,7 +310,6 @@ public class ACBasic implements ACBasicConstants {
       vars1();
       jj_consume_token(PYC);
     }
-     dirProcedimientos.getProcedimientos().get(procedimientoActual).llenaTamanoVar();
   }
 
   static final public void vars1() throws ParseException {
@@ -816,8 +816,7 @@ public class ACBasic implements ACBasicConstants {
                                 //guardar resultado en pila operandos
                                 pilaOperandos.push(direccionRes);
                                 pilaTipos.push(tipoRes);
-                                // agregar al tamaño de procedimiento un temporal
-                                dirProcedimientos.getProcedimientos().get(procedimientoActual).getTamano().setTamanoTemp(tipoRes);
+
                         } else {
                           // ERROR
                           errorHandler(5, tipo1 + " y " +tipo2);
@@ -918,8 +917,7 @@ public class ACBasic implements ACBasicConstants {
                                 //guardar resultado en pila operandos
                                 pilaOperandos.push(direccionRes);
                                 pilaTipos.push(tipoRes);
-                                // agregar al tamaño de procedimiento un temporal
-                                dirProcedimientos.getProcedimientos().get(procedimientoActual).getTamano().setTamanoTemp(tipoRes);
+
                         } else {
                           // ERROR
                           errorHandler(5, tipo1 + " y " +tipo2);
@@ -956,8 +954,7 @@ public class ACBasic implements ACBasicConstants {
                                 //guardar resultado en pila operandos
                                 pilaOperandos.push(direccionRes);
                                 pilaTipos.push(tipoRes);
-                                // agregar al tamaño de procedimiento un temporal
-                                dirProcedimientos.getProcedimientos().get(procedimientoActual).getTamano().setTamanoTemp(tipoRes);
+
                         } else {
                           // ERROR
                           errorHandler(5, tipo1 + " y " +tipo2);
@@ -1018,8 +1015,7 @@ public class ACBasic implements ACBasicConstants {
                                 //guardar resultado en pila operandos
                                 pilaOperandos.push(direccionRes);
                                 pilaTipos.push(tipoRes);
-                                // agregar al tamaño de procedimiento un temporal
-                                dirProcedimientos.getProcedimientos().get(procedimientoActual).getTamano().setTamanoTemp(tipoRes);
+
                         } else {
                           // ERROR
                           errorHandler(5, tipo1 + " y " +tipo2);
@@ -1104,8 +1100,7 @@ public class ACBasic implements ACBasicConstants {
                         //guardar resultado en pila operandos
                         pilaOperandos.push(direccionRes);
                         pilaTipos.push(tipo);
-                        // agregar al tamaño de procedimiento un temporal
-                        dirProcedimientos.getProcedimientos().get(procedimientoActual).getTamano().setTamanoTemp(tipo);
+
                 }
       }
     }
@@ -1265,6 +1260,9 @@ public class ACBasic implements ACBasicConstants {
                         matrizCuadruplos[contadorCuadruplo][3] = i;
                         contadorCuadruplo++;
                 }
+    // agregar al procedimiento llamado las direcciones de los argumentos para usarlos si alguno es por referencia
+    dirProcedimientos.getProcedimientos().get(nombreProc).getFilaDireccionesLlamada().add(argumentosParam);
+
                 // generar cuadruplo de GOSUB
                 matrizCuadruplos[contadorCuadruplo][0] = Codigos.GOSUB;
                 matrizCuadruplos[contadorCuadruplo][1] = Codigos.NULO;
@@ -1283,8 +1281,6 @@ public class ACBasic implements ACBasicConstants {
                   matrizCuadruplos[contadorCuadruplo][3] = ManejadorMemoria.getMemoriaTemporal(tipoFuncLlamada);
                   contadorCuadruplo++;
 
-                  // agregar al tamaño de procedimiento un temporal
-                  dirProcedimientos.getProcedimientos().get(procedimientoActual).getTamano().setTamanoTemp(tipoFuncLlamada);
 
                   // meter a pila de operadores y operandos los valores recien calculados
                   pilaOperandos.push(matrizCuadruplos[contadorCuadruplo-1][3]);
@@ -1584,6 +1580,7 @@ public class ACBasic implements ACBasicConstants {
     Procedimiento mainProc = new Procedimiento();
         mainProc.setNombreProcedimiento("main");
         mainProc.setTipoProcedimiento(Codigos.MAIN);
+  mainProc.setIdentificadorProcedimiento(-2);
 
     // dar de alta el proc main en directorio de procedimientos
     dirProcedimientos.agregarProcedimiento(mainProc);
