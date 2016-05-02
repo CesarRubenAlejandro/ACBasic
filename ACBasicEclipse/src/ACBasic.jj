@@ -892,7 +892,9 @@ void fact3():
 void fact4(String id):
 {}
 {
-  < CORIZQ > exp()
+  < CORIZQ >  {
+    // agregar fondo falso
+	pilaOperadores.push(Codigos.FONDOFALSO);  }exp()
   {
     int tipoIndex = pilaTipos.pop();
     int valorIndex = pilaOperandos.pop();
@@ -919,7 +921,11 @@ void fact4(String id):
 		pilaTipos.push(varArreglo.getTipoVariable());
 	}
   }
-  < CORDER >
+  < CORDER >  {
+	// quitar fondo falso
+	pilaOperadores.pop();
+   }
+    
 }
 
 void fact5(String nombreProc):
